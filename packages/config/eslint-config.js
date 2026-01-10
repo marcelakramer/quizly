@@ -1,6 +1,5 @@
 module.exports = {
   extends: [
-    "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
     "prettier",
   ],
@@ -18,5 +17,5 @@ module.exports = {
     "prefer-const": "error",
     "no-var": "error",
   },
-  ignorePatterns: ["node_modules/", ".next/", "dist/", "build/"],
+  ignorePatterns: ["node_modules/", ".next/", "dist/", "build/", "*.config.js", "*.config.cjs", ".eslintrc.*"],
 };

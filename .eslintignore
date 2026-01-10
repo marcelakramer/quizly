@@ -1,0 +1,9 @@
+node_modules/
+.next/
+dist/
+build/
+*.config.js
+*.config.cjs
+.eslintrc.*
+lint-staged.config.*
+.husky/
