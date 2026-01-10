@@ -100,7 +100,7 @@ export default function StudentQuiz() {
         const idToken = await auth.currentUser?.getIdToken();
 
         if (!idToken) {
-          toast.error("You must be logged in to take this quiz");
+          toast.error("You must be logged in to take this quiz.");
           router.push("/login");
           return;
         }
@@ -120,7 +120,7 @@ export default function StudentQuiz() {
 
         if (userResult?.user) {
           if (userResult.user.role !== UserRole.STUDENT) {
-            toast.error("Only students can take quizzes");
+            toast.error("Only students can take quizzes.");
             router.push("/");
             return;
           }
@@ -138,7 +138,7 @@ export default function StudentQuiz() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        toast.error("Failed to load quiz");
+        toast.error("Failed to load quiz.");
       } finally {
         setLoading(false);
       }
@@ -147,7 +147,7 @@ export default function StudentQuiz() {
     if (authLoading) return;
 
     if (!user) {
-      toast.error("You must be logged in to take this quiz");
+      toast.error("You must be logged in to take this quiz.");
       router.push("/login");
       return;
     }
@@ -195,7 +195,7 @@ export default function StudentQuiz() {
 
   const handleNext = () => {
     if (!answers[currentQuestion.id]) {
-      toast.error("Please select an answer");
+      toast.error("Please select an answer.");
       return;
     }
     if (currentQuestionIndex < list.questions.length - 1) {
@@ -211,12 +211,12 @@ export default function StudentQuiz() {
 
   const handleSubmit = async () => {
     if (!answers[currentQuestion.id]) {
-      toast.error("Please select an answer");
+      toast.error("Please select an answer.");
       return;
     }
 
     if (!user || !dbUser) {
-      toast.error("You must be logged in to submit");
+      toast.error("You must be logged in to submit.");
       return;
     }
 
@@ -245,7 +245,11 @@ export default function StudentQuiz() {
     } catch (error) {
       console.error("Error submitting quiz:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to submit quiz"
+        error instanceof Error
+          ? error.message.endsWith(".")
+            ? error.message
+            : `${error.message}.`
+          : "Failed to submit quiz."
       );
     } finally {
       setSubmitting(false);

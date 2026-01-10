@@ -89,7 +89,7 @@ export default function StudentDashboard() {
     e.preventDefault();
 
     if (!shareCode.trim()) {
-      toast.error("Please enter a quiz code");
+      toast.error("Please enter a quiz code.");
       return;
     }
 
@@ -105,7 +105,9 @@ export default function StudentDashboard() {
       console.error("Error validating quiz code:", error);
       toast.error(
         error instanceof Error
-          ? error.message
+          ? error.message.endsWith(".")
+            ? error.message
+            : `${error.message}.`
           : "Invalid quiz code. Please check and try again."
       );
     } finally {

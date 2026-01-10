@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ExerciseList } from "@teachy/db";
-import { ClipboardList, Users, Share2, ExternalLink } from "lucide-react";
+import { ClipboardList, Users, Share2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -33,7 +33,7 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
         description: "Share this link with your students",
       });
     } catch {
-      toast.error("Failed to copy link");
+      toast.error("Failed to copy link.");
     }
   };
 
@@ -83,11 +83,6 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
               <Button variant="outline" size="sm">
                 <Users className="mr-2 h-4 w-4" />
                 Results
-              </Button>
-            </Link>
-            <Link href={`/quiz/${list.shareCode}`} target="_blank">
-              <Button variant="ghost" size="sm">
-                <ExternalLink className="h-4 w-4" />
               </Button>
             </Link>
           </div>

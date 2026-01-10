@@ -49,7 +49,7 @@ export default function ViewResults() {
         const idToken = await auth.currentUser?.getIdToken();
 
         if (!idToken) {
-          toast.error("You must be logged in");
+          toast.error("You must be logged in.");
           router.push("/login");
           return;
         }
@@ -62,7 +62,11 @@ export default function ViewResults() {
       } catch (error) {
         console.error("Error fetching results:", error);
         toast.error(
-          error instanceof Error ? error.message : "Failed to load results"
+          error instanceof Error
+            ? error.message.endsWith(".")
+              ? error.message
+              : `${error.message}.`
+            : "Failed to load results."
         );
       } finally {
         setLoading(false);
@@ -102,7 +106,7 @@ export default function ViewResults() {
         description: "Share this link with your students",
       });
     } catch {
-      toast.error("Failed to copy link");
+      toast.error("Failed to copy link.");
     }
   };
 

@@ -108,16 +108,16 @@ export default function CreateList() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      toast.error("Please enter a title");
+      toast.error("Please enter a title.");
       return;
     }
     if (questions.length === 0) {
-      toast.error("Please add at least one question");
+      toast.error("Please add at least one question.");
       return;
     }
 
     if (!user) {
-      toast.error("You must be logged in to create an exercise list");
+      toast.error("You must be logged in to create an exercise list.");
       return;
     }
 
@@ -147,8 +147,10 @@ export default function CreateList() {
       console.error("Error creating exercise list:", error);
       toast.error(
         error instanceof Error
-          ? error.message
-          : "Failed to create exercise list"
+          ? error.message.endsWith(".")
+            ? error.message
+            : `${error.message}.`
+          : "Failed to create exercise list."
       );
     } finally {
       setLoading(false);

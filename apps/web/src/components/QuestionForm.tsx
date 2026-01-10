@@ -80,17 +80,17 @@ export function QuestionForm({
     e.preventDefault();
 
     if (!title.trim()) {
-      toast.error("Please enter a question title");
+      toast.error("Please enter a question title.");
       return;
     }
 
     if (options.some((opt) => !opt.label.trim())) {
-      toast.error("Please fill in all options");
+      toast.error("Please fill in all options.");
       return;
     }
 
     if (!options.some((opt) => opt.isCorrect)) {
-      toast.error("Please select a correct answer");
+      toast.error("Please select a correct answer.");
       return;
     }
 

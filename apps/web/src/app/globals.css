@@ -204,6 +204,7 @@
   border-radius: var(--radius) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   padding: 10px 14px !important;
+  min-height: 56px !important;
   font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif !important;
   font-size: 14px !important;
   line-height: 1.4 !important;
@@ -212,43 +213,39 @@
 }
 
 [data-sonner-toast][data-type="success"] {
-  background-color: hsl(var(--success)) !important;
-  color: hsl(var(--success-foreground)) !important;
+  color: hsl(var(--success)) !important;
   border-color: hsl(var(--success) / 0.3) !important;
 }
 
 [data-sonner-toast][data-type="success"] * {
-  color: hsl(var(--success-foreground)) !important;
+  color: hsl(var(--success)) !important;
 }
 
 [data-sonner-toast][data-type="error"] {
-  background-color: hsl(var(--destructive)) !important;
-  color: hsl(var(--destructive-foreground)) !important;
+  color: hsl(var(--destructive)) !important;
   border-color: hsl(var(--destructive) / 0.3) !important;
 }
 
 [data-sonner-toast][data-type="error"] * {
-  color: hsl(var(--destructive-foreground)) !important;
+  color: hsl(var(--destructive)) !important;
 }
 
 [data-sonner-toast][data-type="warning"] {
-  background-color: hsl(var(--accent)) !important;
-  color: hsl(var(--accent-foreground)) !important;
+  color: hsl(var(--accent)) !important;
   border-color: hsl(var(--accent) / 0.3) !important;
 }
 
 [data-sonner-toast][data-type="warning"] * {
-  color: hsl(var(--accent-foreground)) !important;
+  color: hsl(var(--accent)) !important;
 }
 
 [data-sonner-toast][data-type="info"] {
-  background-color: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
+  color: hsl(var(--primary)) !important;
   border-color: hsl(var(--primary) / 0.3) !important;
 }
 
 [data-sonner-toast][data-type="info"] * {
-  color: hsl(var(--primary-foreground)) !important;
+  color: hsl(var(--primary)) !important;
 }
 
 [data-sonner-toast] [data-title] {

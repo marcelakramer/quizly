@@ -88,7 +88,7 @@ export default function SubmissionDetails() {
         const idToken = await auth.currentUser?.getIdToken();
 
         if (!idToken) {
-          toast.error("You must be logged in");
+          toast.error("You must be logged in.");
           router.push("/login");
           return;
         }
@@ -101,8 +101,10 @@ export default function SubmissionDetails() {
         console.error("Error fetching submission details:", error);
         toast.error(
           error instanceof Error
-            ? error.message
-            : "Failed to load submission details"
+            ? error.message.endsWith(".")
+              ? error.message
+              : `${error.message}.`
+            : "Failed to load submission details."
         );
         router.push(`/teacher/results/${listId}`);
       } finally {
