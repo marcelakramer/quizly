@@ -99,7 +99,7 @@ export function Header() {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200">
+              <div className="absolute right-4 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200">
                 <div className="px-4 py-2 border-b border-gray-200">
                   <p className="text-sm font-medium text-gray-900">
                     {dbUser?.name || "User"}
@@ -108,7 +108,7 @@ export function Header() {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   Sign Out
                 </button>

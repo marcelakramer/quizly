@@ -1,0 +1,162 @@
+"use client";
+
+import { useState, FormEvent } from "react";
+import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
+
+interface Option {
+  label: string;
+  isCorrect: boolean;
+}
+
+interface Question {
+  id: string;
+  title: string;
+  options: Option[];
+  order: number;
+}
+
+interface QuestionFormProps {
+  onAddQuestion: (question: Question) => void;
+}
+
+export function QuestionForm({ onAddQuestion }: QuestionFormProps) {
+  const [title, setTitle] = useState("");
+  const [options, setOptions] = useState<Option[]>([
+    { label: "", isCorrect: false },
+    { label: "", isCorrect: false },
+  ]);
+
+  const handleAddOption = () => {
+    setOptions([...options, { label: "", isCorrect: false }]);
+  };
+
+  const handleRemoveOption = (index: number) => {
+    if (options.length > 2) {
+      setOptions(options.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleOptionChange = (index: number, label: string) => {
+    const newOptions = [...options];
+    newOptions[index].label = label;
+    setOptions(newOptions);
+  };
+
+  const handleCorrectChange = (index: number) => {
+    const newOptions = options.map((opt, i) => ({
+      ...opt,
+      isCorrect: i === index,
+    }));
+    setOptions(newOptions);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!title.trim()) {
+      toast.error("Please enter a question title");
+      return;
+    }
+
+    if (options.some((opt) => !opt.label.trim())) {
+      toast.error("Please fill in all options");
+      return;
+    }
+
+    if (!options.some((opt) => opt.isCorrect)) {
+      toast.error("Please select a correct answer");
+      return;
+    }
+
+    const question: Question = {
+      id: Date.now().toString(),
+      title: title.trim(),
+      options: options.map((opt) => ({
+        label: opt.label.trim(),
+        isCorrect: opt.isCorrect,
+      })),
+      order: 0,
+    };
+
+    onAddQuestion(question);
+    toast.success("Question added successfully!");
+    setTitle("");
+    setOptions([
+      { label: "", isCorrect: false },
+      { label: "", isCorrect: false },
+    ]);
+  };
+
+  return (
+    <div className="glass-card rounded-lg p-6">
+      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <Plus className="h-5 w-5 text-primary" />
+        Add Question
+      </h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="question-title" className="block text-sm font-medium">
+            Question
+          </label>
+          <input
+            id="question-title"
+            type="text"
+            placeholder="Enter your question..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Options</label>
+          <div className="space-y-2">
+            {options.map((option, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="correct-option"
+                  checked={option.isCorrect}
+                  onChange={() => handleCorrectChange(index)}
+                  className="h-4 w-4 text-primary focus:ring-primary"
+                />
+                <input
+                  type="text"
+                  placeholder={`Option ${index + 1}`}
+                  value={option.label}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                {options.length > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveOption(index)}
+                    className="p-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={handleAddOption}
+            className="text-sm text-primary hover:text-primary/80 flex items-center gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            Add Option
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
+        >
+          Add Question
+        </button>
+      </form>
+    </div>
+  );
+}

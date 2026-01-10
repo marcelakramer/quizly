@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AuthGuard } from "@/components/AuthGuard";
 import { Header } from "@/components/Header";
+import { Toaster } from "sonner";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
         <AuthProvider>
           <Header />
           <AuthGuard>{children}</AuthGuard>
+          <Toaster position="top-right" richColors />
         </AuthProvider>
       </body>
     </html>

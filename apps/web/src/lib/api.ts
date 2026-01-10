@@ -1,4 +1,4 @@
-import { User, UserRole } from "@teachy/db";
+import { User, UserRole, ExerciseList } from "@teachy/db";
 
 interface ApiError {
   error: string;
@@ -55,5 +55,46 @@ export const api = {
     },
   },
   user: {},
-  exercises: {},
+  exercises: {
+    lists: {
+      getAll: async (
+        idToken: string
+      ): Promise<{
+        lists: (ExerciseList & {
+          questions: { id: string }[];
+          submissions: { id: string }[];
+        })[];
+      }> => {
+        return fetchWithAuth<{
+          lists: (ExerciseList & {
+            questions: { id: string }[];
+            submissions: { id: string }[];
+          })[];
+        }>("/api/exercises/lists", idToken, {
+          method: "GET",
+        });
+      },
+      create: async (
+        idToken: string,
+        data: {
+          title: string;
+          description: string | null;
+          questions: {
+            title: string;
+            options: { label: string; isCorrect: boolean }[];
+            order: number;
+          }[];
+        }
+      ): Promise<{ list: ExerciseList }> => {
+        return fetchWithAuth<{ list: ExerciseList }>(
+          "/api/exercises/lists",
+          idToken,
+          {
+            method: "POST",
+            body: JSON.stringify(data),
+          }
+        );
+      },
+    },
+  },
 } as const;
