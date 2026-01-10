@@ -1,9 +1,8 @@
-import { Dashboard } from "@/components/dashboard";
+import { Dashboard } from "@/components/Dashboard";
 
 export default function TeacherDashboard() {
   return (
     <Dashboard
-      title="Teacher Dashboard"
       welcomeMessage="Welcome, Teacher!"
       description="This is the teacher dashboard. More features coming soon."
     />

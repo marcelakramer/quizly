@@ -47,6 +47,9 @@ importers:
       framer-motion:
         specifier: ^10.18.0
         version: 10.18.0(react-dom@18.3.1)(react@18.3.1)
+      lucide-react:
+        specifier: ^0.562.0
+        version: 0.562.0(react@18.3.1)
       next:
         specifier: ^14.1.0
         version: 14.2.35(react-dom@18.3.1)(react@18.3.1)
@@ -93,6 +96,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.19
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@3.4.19)
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
@@ -4446,6 +4452,14 @@ packages:
       lru-cache: 6.0.0
     dev: false
 
+  /lucide-react@0.562.0(react@18.3.1):
+    resolution: {integrity: sha512-82hOAu7y0dbVuFfmO4bYF1XEwYk/mEbM5E+b1jgci/udUBEE/R7LF5Ip0CCEmXe8AybRM8L+04eP+LGZeDvkiw==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    dependencies:
+      react: 18.3.1
+    dev: false
+
   /make-error@1.3.6:
     resolution: {integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==}
     dev: true
@@ -5816,6 +5830,14 @@ packages:
     dependencies:
       lower-case: 1.1.4
       upper-case: 1.1.3
+    dev: true
+
+  /tailwindcss-animate@1.0.7(tailwindcss@3.4.19):
+    resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      tailwindcss: 3.4.19
     dev: true
 
   /tailwindcss@3.4.19:

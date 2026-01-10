@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
+import { api } from "@/lib/api";
+import { UserRole } from "@teachy/db";
 
 const publicRoutes = ["/login", "/register"];
 
@@ -41,22 +43,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
               return;
             }
 
-            const response = await fetch("/api/auth/me", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${idToken}`,
-              },
-            });
-
-            if (response.ok) {
-              const { user: dbUser } = await response.json();
-              if (dbUser.role === "TEACHER") {
-                router.push("/teacher/dashboard");
-              } else {
-                router.push("/student/dashboard");
-              }
+            const { user: dbUser } = await api.auth.me(idToken);
+            if (dbUser.role === UserRole.TEACHER) {
+              router.push("/teacher/dashboard");
             } else {
-              router.push("/login");
+              router.push("/student/dashboard");
             }
           } catch (error) {
             console.error("Error fetching user role:", error);

@@ -5,7 +5,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { getAuthInstance } from "@teachy/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UserRole } from "@/types/user";
+import { UserRole } from "@teachy/db";
+import { api } from "@/lib/api";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -42,29 +43,15 @@ export default function RegisterPage() {
 
       const idToken = await userCredential.user.getIdToken();
 
-      const response = await fetch("/api/auth/sync", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ role }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to sync user");
-      }
-
-      const { user: dbUser } = await response.json();
+      const { user: dbUser } = await api.auth.sync(idToken, role);
 
       if (dbUser.role === "TEACHER") {
         router.push("/teacher/dashboard");
       } else {
         router.push("/student/dashboard");
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to create account");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create account");
     } finally {
       setLoading(false);
     }
@@ -95,7 +82,7 @@ export default function RegisterPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -130,7 +117,7 @@ export default function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                 placeholder="Password (min. 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -146,7 +133,7 @@ export default function RegisterPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                 placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -158,7 +145,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Creating account..." : "Create account"}
             </button>
@@ -167,7 +154,7 @@ export default function RegisterPage() {
           <div className="text-center">
             <Link
               href="/login"
-              className="text-indigo-600 hover:text-indigo-500 text-sm"
+              className="text-primary hover:text-primary/80 text-sm"
             >
               Already have an account? Sign in here
             </Link>
