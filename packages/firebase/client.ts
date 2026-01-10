@@ -17,15 +17,19 @@ function getFirebaseConfig() {
     process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID;
   const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
 
-  if (
-    !apiKey ||
-    !authDomain ||
-    !projectId ||
-    !storageBucket ||
-    !messagingSenderId ||
-    !appId
-  ) {
-    throw new Error("Missing required Firebase environment variables");
+  const missing = [];
+  if (!apiKey) missing.push("NEXT_PUBLIC_FIREBASE_API_KEY");
+  if (!authDomain) missing.push("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN");
+  if (!projectId) missing.push("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+  if (!storageBucket) missing.push("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET");
+  if (!messagingSenderId)
+    missing.push("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID");
+  if (!appId) missing.push("NEXT_PUBLIC_FIREBASE_APP_ID");
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required Firebase environment variables: ${missing.join(", ")}. Please check your .env file and restart the dev server.`
+    );
   }
 
   return {

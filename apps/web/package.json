@@ -19,7 +19,8 @@
     "@hookform/resolvers": "^3.3.4",
     "framer-motion": "^10.18.0",
     "firebase": "^10.8.0",
-    "@teachy/firebase": "workspace:*"
+    "@teachy/firebase": "workspace:*",
+    "@teachy/db": "workspace:*"
   },
   "devDependencies": {
     "@teachy/config": "workspace:*",
