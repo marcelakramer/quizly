@@ -95,6 +95,76 @@ export const api = {
           }
         );
       },
+      getById: async (
+        idToken: string,
+        listId: string
+      ): Promise<{
+        list: ExerciseList & {
+          questions: Array<{
+            id: string;
+            title: string;
+            order: number;
+            options: Array<{
+              id: string;
+              label: string;
+              isCorrect: boolean;
+            }>;
+          }>;
+          submissions: Array<{ id: string }>;
+        };
+      }> => {
+        return fetchWithAuth<{
+          list: ExerciseList & {
+            questions: Array<{
+              id: string;
+              title: string;
+              order: number;
+              options: Array<{
+                id: string;
+                label: string;
+                isCorrect: boolean;
+              }>;
+            }>;
+            submissions: Array<{ id: string }>;
+          };
+        }>(`/api/exercises/lists/manage/${listId}`, idToken, {
+          method: "GET",
+        });
+      },
+      update: async (
+        idToken: string,
+        listId: string,
+        data: {
+          title: string;
+          description: string | null;
+          questions: {
+            title: string;
+            options: { label: string; isCorrect: boolean }[];
+            order: number;
+          }[];
+        }
+      ): Promise<{ list: ExerciseList }> => {
+        return fetchWithAuth<{ list: ExerciseList }>(
+          `/api/exercises/lists/manage/${listId}`,
+          idToken,
+          {
+            method: "PUT",
+            body: JSON.stringify(data),
+          }
+        );
+      },
+      delete: async (
+        idToken: string,
+        listId: string
+      ): Promise<{ success: boolean }> => {
+        return fetchWithAuth<{ success: boolean }>(
+          `/api/exercises/lists/manage/${listId}`,
+          idToken,
+          {
+            method: "DELETE",
+          }
+        );
+      },
       getSubmissions: async (
         idToken: string,
         listId: string

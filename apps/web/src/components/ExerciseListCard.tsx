@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ExerciseList } from "@teachy/db";
-import { ClipboardList, Users, Share2 } from "lucide-react";
+import { ClipboardList, Users, Share2, Edit } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -75,6 +75,14 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            {list.submissions?.length === 0 && (
+              <Link href={`/teacher/exercise-lists/${list.id}/edit`}>
+                <Button variant="outline" size="sm">
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
+              </Link>
+            )}
             <Button variant="outline" size="sm" onClick={handleShare}>
               <Share2 className="mr-2 h-4 w-4" />
               Share
