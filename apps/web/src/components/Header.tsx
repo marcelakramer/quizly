@@ -13,6 +13,7 @@ import { BookOpen } from "lucide-react";
 import { getInitials } from "@/lib/utils/user";
 
 const publicRoutes = ["/login", "/register"];
+const publicRoutePrefixes = ["/quiz"];
 
 export function Header() {
   const { user, loading } = useAuth();
@@ -70,7 +71,12 @@ export function Header() {
     }
   };
 
-  if (loading || publicRoutes.includes(pathname)) {
+  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicPrefix = publicRoutePrefixes.some((prefix) =>
+    pathname.startsWith(prefix)
+  );
+
+  if (loading || isPublicRoute || isPublicPrefix) {
     return null;
   }
 

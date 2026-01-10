@@ -97,4 +97,132 @@ export const api = {
       },
     },
   },
+  quiz: {
+    getByShareCode: async (
+      shareCode: string
+    ): Promise<{
+      list: ExerciseList & {
+        questions: Array<{
+          id: string;
+          title: string;
+          order: number;
+          options: Array<{
+            id: string;
+            label: string;
+            isCorrect: boolean;
+          }>;
+        }>;
+        teacher: {
+          id: string;
+          name: string;
+          email: string;
+        };
+      };
+    }> => {
+      return fetchApi<{
+        list: ExerciseList & {
+          questions: Array<{
+            id: string;
+            title: string;
+            order: number;
+            options: Array<{
+              id: string;
+              label: string;
+              isCorrect: boolean;
+            }>;
+          }>;
+          teacher: {
+            id: string;
+            name: string;
+            email: string;
+          };
+        };
+      }>(`/api/exercises/lists/${shareCode}`, {
+        method: "GET",
+      });
+    },
+    submit: async (
+      idToken: string,
+      shareCode: string,
+      answers: Array<{
+        questionId: string;
+        selectedOptionId: string;
+      }>
+    ): Promise<{
+      submission: {
+        id: string;
+        score: number;
+        totalQuestions: number;
+        correctAnswers: number;
+        answers: Array<{
+          questionId: string;
+          selectedOptionId: string;
+          isCorrect: boolean;
+          correctOptionId: string;
+        }>;
+      };
+    }> => {
+      return fetchApi<{
+        submission: {
+          id: string;
+          score: number;
+          totalQuestions: number;
+          correctAnswers: number;
+          answers: Array<{
+            questionId: string;
+            selectedOptionId: string;
+            isCorrect: boolean;
+            correctOptionId: string;
+          }>;
+        };
+      }>("/api/exercises/submissions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          shareCode,
+          answers,
+        }),
+      });
+    },
+    checkSubmission: async (
+      idToken: string,
+      shareCode: string
+    ): Promise<{
+      hasSubmission: boolean;
+      submission?: {
+        id: string;
+        score: number;
+        totalQuestions: number;
+        correctAnswers: number;
+        createdAt: Date;
+        answers: Array<{
+          questionId: string;
+          selectedOptionId: string;
+          isCorrect: boolean;
+          correctOptionId: string;
+        }>;
+      };
+    }> => {
+      return fetchWithAuth<{
+        hasSubmission: boolean;
+        submission?: {
+          id: string;
+          score: number;
+          totalQuestions: number;
+          correctAnswers: number;
+          createdAt: Date;
+          answers: Array<{
+            questionId: string;
+            selectedOptionId: string;
+            isCorrect: boolean;
+            correctOptionId: string;
+          }>;
+        };
+      }>(`/api/exercises/submissions/${shareCode}`, idToken, {
+        method: "GET",
+      });
+    },
+  },
 } as const;
