@@ -158,6 +158,48 @@
     transform: scale(1);
   }
 }
+
+@keyframes bookPages {
+  0% {
+    transform: perspective(200px) rotateY(0deg) scale(1);
+  }
+  20% {
+    transform: perspective(200px) rotateY(-25deg) scale(1.05);
+  }
+  40% {
+    transform: perspective(200px) rotateY(0deg) scale(1);
+  }
+  60% {
+    transform: perspective(200px) rotateY(25deg) scale(1.05);
+  }
+  80% {
+    transform: perspective(200px) rotateY(0deg) scale(1);
+  }
+  100% {
+    transform: perspective(200px) rotateY(0deg) scale(1);
+  }
+}
+
+.animate-book-pages {
+  animation: bookPages 2.5s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes spin-dash {
+  0% {
+    stroke-dashoffset: 32;
+  }
+  50% {
+    stroke-dashoffset: 8;
+  }
+  100% {
+    stroke-dashoffset: 32;
+  }
+}
+
+.animate-spin-dash {
+  animation: spin-dash 1.5s ease-in-out infinite;
+}
 [data-sonner-toast] {
   border-radius: var(--radius) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;

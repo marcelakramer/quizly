@@ -3,17 +3,17 @@ import { ClipboardList, Users, CheckCircle } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
         <div className="mx-auto max-w-3xl text-center opacity-0 animate-fade-up">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
             Create engaging
             <span className="text-primary"> assessments</span>
             <br />
             for your students
           </h1>
-          <p className="mt-6 text-lg text-gray-600 md:text-xl">
+          <p className="mt-6 text-lg text-muted-foreground md:text-xl">
             Build interactive quizzes, share them with a simple link, and track
             your students&apos; progress—all in one place.
           </p>
@@ -26,7 +26,7 @@ export default function Home() {
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center bg-white hover:bg-gray-50 text-primary border-2 border-primary px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all"
+              className="inline-flex items-center justify-center bg-background hover:bg-muted text-primary border-2 border-primary px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all"
             >
               Sign In
             </Link>
@@ -37,40 +37,40 @@ export default function Home() {
       {/* Features */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="grid gap-6 md:grid-cols-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow opacity-0 animate-fade-up">
+          <div className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
               <ClipboardList className="h-6 w-6 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-900">
+            <h3 className="text-xl font-semibold mb-2 text-foreground">
               Create Lists
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Build exercise lists with multiple-choice questions. Add as many
               questions and options as you need.
             </p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow opacity-0 animate-fade-up [animation-delay:150ms]">
+          <div className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up [animation-delay:150ms]">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 mb-4">
               <Users className="h-6 w-6 text-accent" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-900">
+            <h3 className="text-xl font-semibold mb-2 text-foreground">
               Share Easily
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Share a simple link with your students. They can take the quiz
               from any device, no login required.
             </p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow opacity-0 animate-fade-up [animation-delay:300ms]">
+          <div className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up [animation-delay:300ms]">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 mb-4">
               <CheckCircle className="h-6 w-6 text-success" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-900">
+            <h3 className="text-xl font-semibold mb-2 text-foreground">
               Track Results
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               View all student submissions in one place. See scores, averages,
               and individual responses.
             </p>
@@ -79,8 +79,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-600">
+      <footer className="border-t border-border py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Teachy. All rights reserved.</p>
         </div>
       </footer>

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { UserRole } from "@teachy/db";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const publicRoutes = ["/login", "/register"];
 
@@ -63,11 +64,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [user, loading, pathname, router, redirecting]);
 
   if (loading || redirecting) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
+    return <SplashScreen />;
   }
 
   const isPublicRoute = publicRoutes.includes(pathname);

@@ -7,6 +7,7 @@ import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { ExerciseList } from "@teachy/db";
 import { ExerciseListCard } from "@/components/ExerciseListCard";
+import { LoadingSpinner } from "@/components/LoadingIcon";
 import { Plus, ClipboardList } from "lucide-react";
 
 type ExerciseListWithRelations = ExerciseList & {
@@ -43,15 +44,7 @@ export default function TeacherDashboard() {
   }, [user]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <main className="container py-8">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-muted-foreground">Loading...</div>
-          </div>
-        </main>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
