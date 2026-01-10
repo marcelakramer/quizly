@@ -1,7 +1,9 @@
+import { ProtectedLayout } from "@/components/ProtectedLayout";
+
 export default function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <ProtectedLayout>{children}</ProtectedLayout>;
 }

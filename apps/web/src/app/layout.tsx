@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
-import { AuthGuard } from "@/components/AuthGuard";
 import { Header } from "@/components/Header";
 import { Toaster } from "sonner";
 
@@ -26,7 +25,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Header />
-          <AuthGuard>{children}</AuthGuard>
+          {children}
           <Toaster position="top-right" richColors />
         </AuthProvider>
       </body>
