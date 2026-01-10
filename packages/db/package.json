@@ -7,7 +7,10 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
-    "studio": "prisma studio"
+    "migrate:deploy": "prisma migrate deploy",
+    "studio": "prisma studio",
+    "validate": "prisma validate",
+    "format": "prisma format"
   },
   "dependencies": {
     "@prisma/client": "^5.9.1"

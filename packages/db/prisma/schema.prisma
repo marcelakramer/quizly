@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  role          UserRole
+  createdAt     DateTime       @default(now())
+  exerciseLists ExerciseList[]
+  submissions   Submission[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model ExerciseList {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  shareCode   String       @unique
+  teacherId   String
+  createdAt   DateTime     @default(now())
+  teacher     User         @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  questions   Question[]
+  submissions Submission[]
+
+  @@index([teacherId])
+  @@index([shareCode])
+  @@map("exercise_lists")
+}
+
+model Question {
+  id             String       @id @default(cuid())
+  exerciseListId String
+  type           QuestionType
+  title          String
+  order          Int
+  createdAt      DateTime     @default(now())
+  answers        Answer[]
+  options        Option[]
+  exerciseList   ExerciseList @relation(fields: [exerciseListId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseListId])
+  @@map("questions")
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  questionId String
+  label      String
+  isCorrect  Boolean
+  createdAt  DateTime @default(now())
+  answers    Answer[]
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@map("options")
+}
+
+model Submission {
+  id             String       @id @default(cuid())
+  exerciseListId String
+  studentId      String
+  score          Float
+  createdAt      DateTime     @default(now())
+  answers        Answer[]
+  exerciseList   ExerciseList @relation(fields: [exerciseListId], references: [id], onDelete: Cascade)
+  student        User         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([exerciseListId, studentId])
+  @@index([exerciseListId])
+  @@index([studentId])
+  @@map("submissions")
+}
+
+model Answer {
+  id               String     @id @default(cuid())
+  submissionId     String
+  questionId       String
+  selectedOptionId String
+  createdAt        DateTime   @default(now())
+  question         Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption   Option     @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
+  submission       Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, questionId])
+  @@index([submissionId])
+  @@index([questionId])
+  @@map("answers")
+}
+
+enum UserRole {
+  TEACHER
+  STUDENT
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+}
