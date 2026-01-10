@@ -1,2 +1,2 @@
-// Firebase client and admin will be exported here
-export {};
+export { getFirebaseApp, getAuthInstance } from "./client";
+export type { User as FirebaseUser } from "firebase/auth";
