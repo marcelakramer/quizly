@@ -1,6 +1,6 @@
 "use client";
 
-import { X, CheckCircle2, Circle, GripVertical } from "lucide-react";
+import { X, CheckCircle2, Circle, GripVertical, Edit } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -20,12 +20,14 @@ interface QuestionPreviewProps {
   question: Question;
   index: number;
   onRemove: (id: string) => void;
+  onEdit: (id: string) => void;
 }
 
 export function QuestionPreview({
   question,
   index,
   onRemove,
+  onEdit,
 }: QuestionPreviewProps) {
   const {
     attributes,
@@ -48,12 +50,22 @@ export function QuestionPreview({
       style={style}
       className="glass-card rounded-lg p-6 relative"
     >
-      <button
-        onClick={() => onRemove(question.id)}
-        className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-destructive transition-colors z-10"
-      >
-        <X className="h-4 w-4" />
-      </button>
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+        <button
+          onClick={() => onEdit(question.id)}
+          className="p-1 text-muted-foreground hover:text-primary transition-colors"
+          aria-label="Edit question"
+        >
+          <Edit className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onRemove(question.id)}
+          className="p-1 text-muted-foreground hover:text-destructive transition-colors"
+          aria-label="Remove question"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
 
       <div className="flex items-start gap-3 mb-4">
         <button

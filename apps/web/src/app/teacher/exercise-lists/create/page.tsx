@@ -45,6 +45,9 @@ export default function CreateList() {
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
+    null
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -66,6 +69,24 @@ export default function CreateList() {
       .filter((q) => q.id !== id)
       .map((q, index) => ({ ...q, order: index }));
     setQuestions(newQuestions);
+    if (editingQuestionId === id) {
+      setEditingQuestionId(null);
+    }
+  };
+
+  const handleEditQuestion = (id: string) => {
+    setEditingQuestionId(id);
+  };
+
+  const handleUpdateQuestion = (updatedQuestion: Question) => {
+    setQuestions((prev) =>
+      prev.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
+    );
+    setEditingQuestionId(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingQuestionId(null);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -198,7 +219,16 @@ export default function CreateList() {
               </div>
             </div>
 
-            <QuestionForm onAddQuestion={handleAddQuestion} />
+            <QuestionForm
+              onAddQuestion={handleAddQuestion}
+              initialQuestion={
+                editingQuestionId
+                  ? questions.find((q) => q.id === editingQuestionId) || null
+                  : null
+              }
+              onUpdateQuestion={handleUpdateQuestion}
+              onCancel={handleCancelEdit}
+            />
           </div>
 
           <div
@@ -247,6 +277,7 @@ export default function CreateList() {
                         question={question}
                         index={index}
                         onRemove={handleRemoveQuestion}
+                        onEdit={handleEditQuestion}
                       />
                     ))}
                   </div>

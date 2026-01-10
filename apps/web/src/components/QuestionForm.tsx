@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import { Plus, X } from "lucide-react";
+import { useState, useEffect, FormEvent } from "react";
+import { Plus, X, Edit } from "lucide-react";
 import { toast } from "sonner";
 
 interface Option {
@@ -18,14 +18,39 @@ interface Question {
 
 interface QuestionFormProps {
   onAddQuestion: (question: Question) => void;
+  initialQuestion?: Question | null;
+  onUpdateQuestion?: (question: Question) => void;
+  onCancel?: () => void;
 }
 
-export function QuestionForm({ onAddQuestion }: QuestionFormProps) {
-  const [title, setTitle] = useState("");
-  const [options, setOptions] = useState<Option[]>([
-    { label: "", isCorrect: false },
-    { label: "", isCorrect: false },
-  ]);
+export function QuestionForm({
+  onAddQuestion,
+  initialQuestion,
+  onUpdateQuestion,
+  onCancel,
+}: QuestionFormProps) {
+  const isEditing = !!initialQuestion;
+  const [title, setTitle] = useState(initialQuestion?.title || "");
+  const [options, setOptions] = useState<Option[]>(
+    initialQuestion?.options || [
+      { label: "", isCorrect: false },
+      { label: "", isCorrect: false },
+    ]
+  );
+
+  // Update form when initialQuestion changes
+  useEffect(() => {
+    if (initialQuestion) {
+      setTitle(initialQuestion.title);
+      setOptions(initialQuestion.options);
+    } else {
+      setTitle("");
+      setOptions([
+        { label: "", isCorrect: false },
+        { label: "", isCorrect: false },
+      ]);
+    }
+  }, [initialQuestion]);
 
   const handleAddOption = () => {
     setOptions([...options, { label: "", isCorrect: false }]);
@@ -70,29 +95,44 @@ export function QuestionForm({ onAddQuestion }: QuestionFormProps) {
     }
 
     const question: Question = {
-      id: Date.now().toString(),
+      id: initialQuestion?.id || Date.now().toString(),
       title: title.trim(),
       options: options.map((opt) => ({
         label: opt.label.trim(),
         isCorrect: opt.isCorrect,
       })),
-      order: 0,
+      order: initialQuestion?.order || 0,
     };
 
-    onAddQuestion(question);
-    toast.success("Question added successfully!");
-    setTitle("");
-    setOptions([
-      { label: "", isCorrect: false },
-      { label: "", isCorrect: false },
-    ]);
+    if (isEditing && onUpdateQuestion) {
+      onUpdateQuestion(question);
+      toast.success("Question updated successfully!");
+      onCancel?.();
+    } else {
+      onAddQuestion(question);
+      toast.success("Question added successfully!");
+      setTitle("");
+      setOptions([
+        { label: "", isCorrect: false },
+        { label: "", isCorrect: false },
+      ]);
+    }
   };
 
   return (
     <div className="glass-card rounded-lg p-6">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <Plus className="h-5 w-5 text-primary" />
-        Add Question
+        {isEditing ? (
+          <>
+            <Edit className="h-5 w-5 text-primary" />
+            Edit Question
+          </>
+        ) : (
+          <>
+            <Plus className="h-5 w-5 text-primary" />
+            Add Question
+          </>
+        )}
       </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
@@ -150,12 +190,25 @@ export function QuestionForm({ onAddQuestion }: QuestionFormProps) {
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors"
-        >
-          Add Question
-        </button>
+        <div className="flex gap-2">
+          {isEditing && onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 border border-border hover:bg-muted px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="submit"
+            className={`${
+              isEditing ? "flex-1" : "w-full"
+            } bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors`}
+          >
+            {isEditing ? "Update Question" : "Add Question"}
+          </button>
+        </div>
       </form>
     </div>
   );
