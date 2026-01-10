@@ -5,15 +5,10 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
-import { ExerciseList } from "@teachy/db";
 import { ExerciseListCard } from "@/components/ExerciseListCard";
 import { LoadingSpinner } from "@/components/LoadingIcon";
 import { Plus, ClipboardList } from "lucide-react";
-
-type ExerciseListWithRelations = ExerciseList & {
-  questions: { id: string }[];
-  submissions: { id: string }[];
-};
+import { ExerciseListWithRelations } from "@/types";
 
 export default function TeacherDashboard() {
   const { user } = useAuth();

@@ -84,10 +84,11 @@ model Answer {
   id               String     @id @default(cuid())
   submissionId     String
   questionId       String
-  selectedOptionId String
+  selectedOptionId String?
+  textAnswer       String?
   createdAt        DateTime   @default(now())
   question         Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  selectedOption   Option     @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
+  selectedOption   Option?    @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
   submission       Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@unique([submissionId, questionId])
@@ -103,4 +104,5 @@ enum UserRole {
 
 enum QuestionType {
   MULTIPLE_CHOICE
+  OPEN_ENDED
 }

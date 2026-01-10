@@ -9,6 +9,7 @@ const updateListSchema = z.object({
   questions: z.array(
     z.object({
       title: z.string().min(1, "Question title is required"),
+      type: z.nativeEnum(QuestionType),
       options: z
         .array(
           z.object({
@@ -16,7 +17,7 @@ const updateListSchema = z.object({
             isCorrect: z.boolean(),
           })
         )
-        .min(2, "At least 2 options are required"),
+        .optional(),
       order: z.number(),
     })
   ),
@@ -204,14 +205,20 @@ export async function PUT(
         questions: {
           create: validatedData.questions.map((q) => ({
             title: q.title,
-            type: QuestionType.MULTIPLE_CHOICE,
+            type: q.type as QuestionType,
             order: q.order,
-            options: {
-              create: q.options.map((opt) => ({
-                label: opt.label,
-                isCorrect: opt.isCorrect,
-              })),
-            },
+            ...(q.type === QuestionType.MULTIPLE_CHOICE &&
+            q.options &&
+            q.options.length > 0
+              ? {
+                  options: {
+                    create: q.options.map((opt) => ({
+                      label: opt.label,
+                      isCorrect: opt.isCorrect,
+                    })),
+                  },
+                }
+              : {}),
           })),
         },
       },

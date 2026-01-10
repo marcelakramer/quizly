@@ -32,25 +32,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { LoadingSpinner } from "@/components/LoadingIcon";
 
-interface StudentSubmission {
-  id: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-  createdAt: Date;
-  exerciseList: {
-    id: string;
-    title: string;
-    description: string | null;
-    shareCode: string;
-    teacher: {
-      id: string;
-      name: string;
-      email: string;
-    };
-    questionCount: number;
-  };
-}
+import { StudentSubmission } from "@/types";
 
 export default function StudentDashboard() {
   const router = useRouter();

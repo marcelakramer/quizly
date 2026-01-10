@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ExerciseList } from "@teachy/db";
 import { ClipboardList, Users, Share2, Edit } from "lucide-react";
 import {
   Card,
@@ -12,11 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-type ExerciseListWithRelations = ExerciseList & {
-  questions: { id: string }[];
-  submissions: { id: string }[];
-};
+import { ExerciseListWithRelations } from "@/types";
 
 interface ExerciseListCardProps {
   list: ExerciseListWithRelations;

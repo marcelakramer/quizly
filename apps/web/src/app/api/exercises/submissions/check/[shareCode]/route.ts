@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, UserRole } from "@teachy/db";
+import { prisma, UserRole, QuestionType } from "@teachy/db";
 import { getAdminAuth } from "@teachy/firebase/admin";
 
 export async function GET(
@@ -81,8 +81,16 @@ export async function GET(
       return NextResponse.json({ hasSubmission: false });
     }
 
+    // Only count multiple choice questions for scoring
+    const multipleChoiceQuestions = exerciseList.questions.filter(
+      (q) => q.type === QuestionType.MULTIPLE_CHOICE
+    );
+
     const correctAnswers = submission.answers.reduce((acc, answer) => {
-      return acc + (answer.selectedOption.isCorrect ? 1 : 0);
+      if (answer.selectedOption && answer.selectedOption.isCorrect) {
+        return acc + 1;
+      }
+      return acc;
     }, 0);
 
     return NextResponse.json({
@@ -90,16 +98,27 @@ export async function GET(
       submission: {
         id: submission.id,
         score: submission.score,
-        totalQuestions: exerciseList.questions.length,
+        totalQuestions: multipleChoiceQuestions.length,
         correctAnswers,
         createdAt: submission.createdAt,
-        answers: submission.answers.map((answer) => ({
-          questionId: answer.questionId,
-          selectedOptionId: answer.selectedOptionId,
-          isCorrect: answer.selectedOption.isCorrect,
-          correctOptionId:
-            answer.question.options.find((opt) => opt.isCorrect)?.id || "",
-        })),
+        answers: submission.answers.map((answer) => {
+          const question = exerciseList.questions.find(
+            (q) => q.id === answer.questionId
+          );
+          const isOpenEnded = question?.type === QuestionType.OPEN_ENDED;
+
+          return {
+            questionId: answer.questionId,
+            selectedOptionId: answer.selectedOptionId || undefined,
+            textAnswer: answer.textAnswer || undefined,
+            isCorrect: isOpenEnded
+              ? undefined
+              : answer.selectedOption?.isCorrect || false,
+            correctOptionId: isOpenEnded
+              ? undefined
+              : answer.question.options.find((opt) => opt.isCorrect)?.id || "",
+          };
+        }),
       },
     });
   } catch (error) {

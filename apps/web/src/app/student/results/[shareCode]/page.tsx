@@ -18,56 +18,8 @@ import {
   Trophy,
 } from "lucide-react";
 import { toast } from "sonner";
-
-interface SubmissionDetail {
-  id: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-  createdAt: Date;
-  exerciseList: {
-    id: string;
-    title: string;
-    description: string | null;
-    shareCode: string;
-    questions: Array<{
-      id: string;
-      title: string;
-      order: number;
-      options: Array<{
-        id: string;
-        label: string;
-        isCorrect: boolean;
-      }>;
-    }>;
-    teacher: {
-      id: string;
-      name: string;
-      email: string;
-    };
-  };
-  answers: Array<{
-    questionId: string;
-    question: {
-      id: string;
-      title: string;
-      order: number;
-      options: Array<{
-        id: string;
-        label: string;
-        isCorrect: boolean;
-      }>;
-    };
-    selectedOptionId: string;
-    selectedOption: {
-      id: string;
-      label: string;
-      isCorrect: boolean;
-    };
-    isCorrect: boolean;
-    correctOptionId: string;
-  }>;
-}
+import { QuestionType } from "@teachy/db";
+import { SubmissionDetail } from "@/types";
 
 export default function StudentResults() {
   const params = useParams();
@@ -108,7 +60,8 @@ export default function StudentResults() {
             fetchedSubmission.id
           );
 
-        setSubmission(fullSubmission);
+        // API already returns the type correctly, just ensure type safety
+        setSubmission(fullSubmission as SubmissionDetail);
       } catch (error) {
         console.error("Error fetching submission details:", error);
         toast.error(
@@ -192,7 +145,7 @@ export default function StudentResults() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    {submission.exerciseList.teacher.name}
+                    {submission.exerciseList.teacher?.name || "Unknown"}
                   </p>
                   <p className="text-xs text-muted-foreground">Teacher</p>
                 </div>
@@ -261,6 +214,8 @@ export default function StudentResults() {
           <CardContent>
             <div className="space-y-4">
               {sortedAnswers.map((answer, index) => {
+                const isOpenEnded =
+                  answer.question.type === QuestionType.OPEN_ENDED;
                 const isCorrect = answer.isCorrect;
                 const correctOption = answer.question.options.find(
                   (opt) => opt.id === answer.correctOptionId
@@ -270,14 +225,18 @@ export default function StudentResults() {
                   <div
                     key={answer.questionId}
                     className={`rounded-lg p-4 border-2 ${
-                      isCorrect
+                      isOpenEnded
                         ? "bg-success/10 border-success/20"
-                        : "bg-destructive/10 border-destructive/20"
+                        : isCorrect
+                          ? "bg-success/10 border-success/20"
+                          : "bg-destructive/10 border-destructive/20"
                     } opacity-0 animate-fade-up`}
                     style={{ animationDelay: `${0.4 + index * 0.05}s` }}
                   >
                     <div className="flex items-start gap-3">
-                      {isCorrect ? (
+                      {isOpenEnded ? (
+                        <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                      ) : isCorrect ? (
                         <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
                       ) : (
                         <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -287,27 +246,42 @@ export default function StudentResults() {
                           Q{index + 1}: {answer.question.title}
                         </p>
                         <div className="space-y-2">
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground mb-1">
-                              Your Answer:
-                            </p>
-                            <p
-                              className={`text-sm ${
-                                isCorrect ? "text-success" : "text-destructive"
-                              }`}
-                            >
-                              {answer.selectedOption.label}
-                            </p>
-                          </div>
-                          {!isCorrect && correctOption && (
+                          {isOpenEnded ? (
                             <div>
                               <p className="text-xs font-medium text-muted-foreground mb-1">
-                                Correct Answer:
+                                Your Answer:
                               </p>
-                              <p className="text-sm text-success font-medium">
-                                {correctOption.label}
+                              <p className="text-sm text-success">
+                                {answer.textAnswer || "No answer provided"}
                               </p>
                             </div>
+                          ) : (
+                            <>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground mb-1">
+                                  Your Answer:
+                                </p>
+                                <p
+                                  className={`text-sm ${
+                                    isCorrect
+                                      ? "text-success"
+                                      : "text-destructive"
+                                  }`}
+                                >
+                                  {answer.selectedOption?.label}
+                                </p>
+                              </div>
+                              {!isCorrect && correctOption && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                                    Correct Answer:
+                                  </p>
+                                  <p className="text-sm text-success font-medium">
+                                    {correctOption.label}
+                                  </p>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>

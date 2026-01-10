@@ -35,18 +35,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-interface Option {
-  label: string;
-  isCorrect: boolean;
-}
-
-export interface Question {
-  id: string;
-  title: string;
-  options: Option[];
-  order: number;
-}
+import { Question } from "@/types";
 
 export default function EditList() {
   const router = useRouter();
@@ -99,6 +88,7 @@ export default function EditList() {
           list.questions.map((q) => ({
             id: q.id,
             title: q.title,
+            type: q.type,
             options: q.options.map((opt) => ({
               label: opt.label,
               isCorrect: opt.isCorrect,
@@ -206,6 +196,7 @@ export default function EditList() {
         description: description.trim() || null,
         questions: questions.map((q) => ({
           title: q.title,
+          type: q.type,
           options: q.options,
           order: q.order,
         })),

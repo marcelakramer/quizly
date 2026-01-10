@@ -12,23 +12,7 @@ import { LoadingSpinner } from "@/components/LoadingIcon";
 import { ArrowLeft, Users, Trophy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
-interface Submission {
-  id: string;
-  studentName: string;
-  studentEmail: string;
-  score: number;
-  totalQuestions: number;
-  percentage: number;
-  submittedAt: Date;
-}
-
-interface ExerciseList {
-  id: string;
-  title: string;
-  description: string | null;
-  shareCode: string;
-  questions: Array<{ id: string }>;
-}
+import { Submission, ExerciseListSummary } from "@/types";
 
 export default function ViewResults() {
   const params = useParams();
@@ -36,7 +20,7 @@ export default function ViewResults() {
   const { user } = useAuth();
   const listId = params.listId as string;
 
-  const [list, setList] = useState<ExerciseList | null>(null);
+  const [list, setList] = useState<ExerciseListSummary | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
 

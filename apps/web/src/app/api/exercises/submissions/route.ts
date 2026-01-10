@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, UserRole } from "@teachy/db";
+import { prisma, UserRole, QuestionType } from "@teachy/db";
 import { getAdminAuth } from "@teachy/firebase/admin";
 import { z } from "zod";
 
@@ -8,7 +8,8 @@ const submitSchema = z.object({
   answers: z.array(
     z.object({
       questionId: z.string(),
-      selectedOptionId: z.string(),
+      selectedOptionId: z.string().optional(),
+      textAnswer: z.string().optional(),
     })
   ),
 });
@@ -69,7 +70,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const correctAnswers = exerciseList.questions.reduce((acc, question) => {
+    // Only count multiple choice questions for scoring
+    const multipleChoiceQuestions = exerciseList.questions.filter(
+      (q) => q.type === QuestionType.MULTIPLE_CHOICE
+    );
+
+    const correctAnswers = multipleChoiceQuestions.reduce((acc, question) => {
       const correctOption = question.options.find((opt) => opt.isCorrect);
       const studentAnswer = validatedData.answers.find(
         (a) => a.questionId === question.id
@@ -84,7 +90,11 @@ export async function POST(request: NextRequest) {
       return acc;
     }, 0);
 
-    const score = (correctAnswers / exerciseList.questions.length) * 100;
+    // Score is based only on multiple choice questions
+    const score =
+      multipleChoiceQuestions.length > 0
+        ? (correctAnswers / multipleChoiceQuestions.length) * 100
+        : 0;
 
     const existingSubmission = await prisma.submission.findUnique({
       where: {
@@ -106,10 +116,30 @@ export async function POST(request: NextRequest) {
         data: {
           score,
           answers: {
-            create: validatedData.answers.map((answer) => ({
-              questionId: answer.questionId,
-              selectedOptionId: answer.selectedOptionId,
-            })),
+            create: validatedData.answers.map((answer) => {
+              const question = exerciseList.questions.find(
+                (q) => q.id === answer.questionId
+              );
+              const isOpenEnded = question?.type === QuestionType.OPEN_ENDED;
+
+              const baseAnswer: {
+                questionId: string;
+                selectedOptionId: string | null;
+                textAnswer: string | null;
+              } = {
+                questionId: answer.questionId,
+                selectedOptionId: null,
+                textAnswer: null,
+              };
+
+              if (isOpenEnded) {
+                baseAnswer.textAnswer = answer.textAnswer || null;
+              } else {
+                baseAnswer.selectedOptionId = answer.selectedOptionId || null;
+              }
+
+              return baseAnswer;
+            }),
           },
         },
         include: {
@@ -132,10 +162,30 @@ export async function POST(request: NextRequest) {
           studentId: user.id,
           score,
           answers: {
-            create: validatedData.answers.map((answer) => ({
-              questionId: answer.questionId,
-              selectedOptionId: answer.selectedOptionId,
-            })),
+            create: validatedData.answers.map((answer) => {
+              const question = exerciseList.questions.find(
+                (q) => q.id === answer.questionId
+              );
+              const isOpenEnded = question?.type === QuestionType.OPEN_ENDED;
+
+              const baseAnswer: {
+                questionId: string;
+                selectedOptionId: string | null;
+                textAnswer: string | null;
+              } = {
+                questionId: answer.questionId,
+                selectedOptionId: null,
+                textAnswer: null,
+              };
+
+              if (isOpenEnded) {
+                baseAnswer.textAnswer = answer.textAnswer || null;
+              } else {
+                baseAnswer.selectedOptionId = answer.selectedOptionId || null;
+              }
+
+              return baseAnswer;
+            }),
           },
         },
         include: {
@@ -157,18 +207,26 @@ export async function POST(request: NextRequest) {
       submission: {
         id: submission.id,
         score: submission.score,
-        totalQuestions: exerciseList.questions.length,
+        totalQuestions: multipleChoiceQuestions.length,
         correctAnswers,
-        answers: submission.answers.map((answer) => ({
-          questionId: answer.questionId,
-          selectedOptionId: answer.selectedOptionId,
-          isCorrect:
-            answer.question.options.find(
-              (opt) => opt.id === answer.selectedOptionId
-            )?.isCorrect || false,
-          correctOptionId: answer.question.options.find((opt) => opt.isCorrect)
-            ?.id,
-        })),
+        answers: submission.answers.map((answer) => {
+          const question = exerciseList.questions.find(
+            (q) => q.id === answer.questionId
+          );
+          const isOpenEnded = question?.type === QuestionType.OPEN_ENDED;
+
+          return {
+            questionId: answer.questionId,
+            selectedOptionId: answer.selectedOptionId || undefined,
+            textAnswer: answer.textAnswer || undefined,
+            isCorrect: isOpenEnded
+              ? undefined
+              : answer.selectedOption?.isCorrect || false,
+            correctOptionId: isOpenEnded
+              ? undefined
+              : question?.options.find((opt) => opt.isCorrect)?.id,
+          };
+        }),
       },
     });
   } catch (error) {

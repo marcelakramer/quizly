@@ -1,4 +1,4 @@
-import { User, UserRole, ExerciseList } from "@teachy/db";
+import { User, UserRole, ExerciseList, QuestionType } from "@teachy/db";
 
 interface ApiError {
   error: string;
@@ -81,7 +81,8 @@ export const api = {
           description: string | null;
           questions: {
             title: string;
-            options: { label: string; isCorrect: boolean }[];
+            type: QuestionType;
+            options?: { label: string; isCorrect: boolean }[];
             order: number;
           }[];
         }
@@ -103,6 +104,7 @@ export const api = {
           questions: Array<{
             id: string;
             title: string;
+            type: QuestionType;
             order: number;
             options: Array<{
               id: string;
@@ -118,6 +120,7 @@ export const api = {
             questions: Array<{
               id: string;
               title: string;
+              type: QuestionType;
               order: number;
               options: Array<{
                 id: string;
@@ -139,7 +142,8 @@ export const api = {
           description: string | null;
           questions: {
             title: string;
-            options: { label: string; isCorrect: boolean }[];
+            type: QuestionType;
+            options?: { label: string; isCorrect: boolean }[];
             order: number;
           }[];
         }
@@ -237,6 +241,7 @@ export const api = {
             questions: Array<{
               id: string;
               title: string;
+              type: QuestionType;
               order: number;
               options: Array<{
                 id: string;
@@ -250,6 +255,7 @@ export const api = {
             question: {
               id: string;
               title: string;
+              type: QuestionType;
               order: number;
               options: Array<{
                 id: string;
@@ -257,14 +263,15 @@ export const api = {
                 isCorrect: boolean;
               }>;
             };
-            selectedOptionId: string;
-            selectedOption: {
+            selectedOptionId?: string;
+            selectedOption?: {
               id: string;
               label: string;
               isCorrect: boolean;
             };
-            isCorrect: boolean;
-            correctOptionId: string;
+            textAnswer?: string;
+            isCorrect?: boolean;
+            correctOptionId?: string;
           }>;
         };
       }> => {
@@ -293,6 +300,7 @@ export const api = {
               questions: Array<{
                 id: string;
                 title: string;
+                type: QuestionType;
                 order: number;
                 options: Array<{
                   id: string;
@@ -306,6 +314,7 @@ export const api = {
               question: {
                 id: string;
                 title: string;
+                type: QuestionType;
                 order: number;
                 options: Array<{
                   id: string;
@@ -313,14 +322,15 @@ export const api = {
                   isCorrect: boolean;
                 }>;
               };
-              selectedOptionId: string;
-              selectedOption: {
+              selectedOptionId?: string;
+              selectedOption?: {
                 id: string;
                 label: string;
                 isCorrect: boolean;
               };
-              isCorrect: boolean;
-              correctOptionId: string;
+              textAnswer?: string;
+              isCorrect?: boolean;
+              correctOptionId?: string;
             }>;
           };
         }>(`/api/exercises/submissions/${submissionId}`, idToken, {
@@ -386,6 +396,7 @@ export const api = {
         questions: Array<{
           id: string;
           title: string;
+          type: QuestionType;
           order: number;
           options: Array<{
             id: string;
@@ -405,6 +416,7 @@ export const api = {
           questions: Array<{
             id: string;
             title: string;
+            type: QuestionType;
             order: number;
             options: Array<{
               id: string;
@@ -427,7 +439,8 @@ export const api = {
       shareCode: string,
       answers: Array<{
         questionId: string;
-        selectedOptionId: string;
+        selectedOptionId?: string;
+        textAnswer?: string;
       }>
     ): Promise<{
       submission: {
@@ -437,9 +450,10 @@ export const api = {
         correctAnswers: number;
         answers: Array<{
           questionId: string;
-          selectedOptionId: string;
-          isCorrect: boolean;
-          correctOptionId: string;
+          selectedOptionId?: string;
+          textAnswer?: string;
+          isCorrect?: boolean;
+          correctOptionId?: string;
         }>;
       };
     }> => {
@@ -451,9 +465,10 @@ export const api = {
           correctAnswers: number;
           answers: Array<{
             questionId: string;
-            selectedOptionId: string;
-            isCorrect: boolean;
-            correctOptionId: string;
+            selectedOptionId?: string;
+            textAnswer?: string;
+            isCorrect?: boolean;
+            correctOptionId?: string;
           }>;
         };
       }>("/api/exercises/submissions", {

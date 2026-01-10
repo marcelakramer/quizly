@@ -9,65 +9,10 @@ import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingIcon";
-import {
-  ArrowLeft,
-  CheckCircle,
-  XCircle,
-  User,
-  Clock,
-  FileText,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
 import { toast } from "sonner";
-
-interface SubmissionDetail {
-  id: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-  createdAt: Date;
-  student: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  exerciseList: {
-    id: string;
-    title: string;
-    description: string | null;
-    shareCode: string;
-    questions: Array<{
-      id: string;
-      title: string;
-      order: number;
-      options: Array<{
-        id: string;
-        label: string;
-        isCorrect: boolean;
-      }>;
-    }>;
-  };
-  answers: Array<{
-    questionId: string;
-    question: {
-      id: string;
-      title: string;
-      order: number;
-      options: Array<{
-        id: string;
-        label: string;
-        isCorrect: boolean;
-      }>;
-    };
-    selectedOptionId: string;
-    selectedOption: {
-      id: string;
-      label: string;
-      isCorrect: boolean;
-    };
-    isCorrect: boolean;
-    correctOptionId: string;
-  }>;
-}
+import { QuestionType } from "@teachy/db";
+import { SubmissionDetail } from "@/types";
 
 export default function SubmissionDetails() {
   const params = useParams();
@@ -180,10 +125,10 @@ export default function SubmissionDetails() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    {submission.student.name}
+                    {submission.student?.name}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {submission.student.email}
+                    {submission.student?.email}
                   </p>
                 </div>
               </div>
@@ -194,7 +139,7 @@ export default function SubmissionDetails() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
-                  <FileText className="h-5 w-5 text-success" />
+                  <CheckCircle className="h-5 w-5 text-success" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">
@@ -249,6 +194,8 @@ export default function SubmissionDetails() {
           <CardContent>
             <div className="space-y-4">
               {sortedAnswers.map((answer, index) => {
+                const isOpenEnded =
+                  answer.question.type === QuestionType.OPEN_ENDED;
                 const isCorrect = answer.isCorrect;
                 const correctOption = answer.question.options.find(
                   (opt) => opt.id === answer.correctOptionId
@@ -258,14 +205,18 @@ export default function SubmissionDetails() {
                   <div
                     key={answer.questionId}
                     className={`rounded-lg p-4 border-2 ${
-                      isCorrect
+                      isOpenEnded
                         ? "bg-success/10 border-success/20"
-                        : "bg-destructive/10 border-destructive/20"
+                        : isCorrect
+                          ? "bg-success/10 border-success/20"
+                          : "bg-destructive/10 border-destructive/20"
                     } opacity-0 animate-fade-up`}
                     style={{ animationDelay: `${0.4 + index * 0.05}s` }}
                   >
                     <div className="flex items-start gap-3">
-                      {isCorrect ? (
+                      {isOpenEnded ? (
+                        <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                      ) : isCorrect ? (
                         <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
                       ) : (
                         <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -275,27 +226,42 @@ export default function SubmissionDetails() {
                           Q{index + 1}: {answer.question.title}
                         </p>
                         <div className="space-y-2">
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground mb-1">
-                              Student&apos;s Answer:
-                            </p>
-                            <p
-                              className={`text-sm ${
-                                isCorrect ? "text-success" : "text-destructive"
-                              }`}
-                            >
-                              {answer.selectedOption.label}
-                            </p>
-                          </div>
-                          {!isCorrect && correctOption && (
+                          {isOpenEnded ? (
                             <div>
                               <p className="text-xs font-medium text-muted-foreground mb-1">
-                                Correct Answer:
+                                Student&apos;s Answer:
                               </p>
-                              <p className="text-sm text-success font-medium">
-                                {correctOption.label}
+                              <p className="text-sm text-success">
+                                {answer.textAnswer || "No answer provided"}
                               </p>
                             </div>
+                          ) : (
+                            <>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground mb-1">
+                                  Student&apos;s Answer:
+                                </p>
+                                <p
+                                  className={`text-sm ${
+                                    isCorrect
+                                      ? "text-success"
+                                      : "text-destructive"
+                                  }`}
+                                >
+                                  {answer.selectedOption?.label}
+                                </p>
+                              </div>
+                              {!isCorrect && correctOption && (
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground mb-1">
+                                    Correct Answer:
+                                  </p>
+                                  <p className="text-sm text-success font-medium">
+                                    {correctOption.label}
+                                  </p>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>

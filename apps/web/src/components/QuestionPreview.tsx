@@ -1,20 +1,17 @@
 "use client";
 
-import { X, CheckCircle2, Circle, GripVertical, Edit } from "lucide-react";
+import {
+  X,
+  CheckCircle2,
+  Circle,
+  GripVertical,
+  Edit,
+  FileText,
+} from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-
-interface Option {
-  label: string;
-  isCorrect: boolean;
-}
-
-interface Question {
-  id: string;
-  title: string;
-  options: Option[];
-  order: number;
-}
+import { QuestionType } from "@teachy/db";
+import { Question } from "@/types";
 
 interface QuestionPreviewProps {
   question: Question;
@@ -83,34 +80,45 @@ export function QuestionPreview({
           <h4 className="font-semibold text-foreground mb-3">
             {question.title}
           </h4>
-          <div className="space-y-2">
-            {question.options.map((option, optIndex) => (
-              <div
-                key={optIndex}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md ${
-                  option.isCorrect
-                    ? "bg-success/10 border border-success/20"
-                    : "bg-muted"
-                }`}
-              >
-                {option.isCorrect ? (
-                  <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
-                ) : (
-                  <Circle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                )}
-                <span
-                  className={option.isCorrect ? "text-success font-medium" : ""}
+          {question.type === QuestionType.OPEN_ENDED ? (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/50 border border-border">
+              <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm text-muted-foreground">
+                Students will provide a text answer
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {question.options.map((option, optIndex) => (
+                <div
+                  key={optIndex}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md ${
+                    option.isCorrect
+                      ? "bg-success/10 border border-success/20"
+                      : "bg-muted"
+                  }`}
                 >
-                  {option.label}
-                </span>
-                {option.isCorrect && (
-                  <span className="ml-auto text-xs text-success font-medium">
-                    Correct
+                  {option.isCorrect ? (
+                    <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  )}
+                  <span
+                    className={
+                      option.isCorrect ? "text-success font-medium" : ""
+                    }
+                  >
+                    {option.label}
                   </span>
-                )}
-              </div>
-            ))}
-          </div>
+                  {option.isCorrect && (
+                    <span className="ml-auto text-xs text-success font-medium">
+                      Correct
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

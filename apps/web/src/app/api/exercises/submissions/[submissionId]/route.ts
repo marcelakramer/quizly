@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth } from "@teachy/firebase/admin";
-import { prisma, UserRole } from "@teachy/db";
+import { prisma, UserRole, QuestionType } from "@teachy/db";
 
 export async function GET(
   request: NextRequest,
@@ -105,9 +105,16 @@ export async function GET(
       }
     }
 
-    const totalQuestions = submission.exerciseList.questions.length;
+    // Only count multiple choice questions for scoring
+    const multipleChoiceQuestions = submission.exerciseList.questions.filter(
+      (q) => q.type === QuestionType.MULTIPLE_CHOICE
+    );
+    const totalQuestions = multipleChoiceQuestions.length;
     const correctAnswers = submission.answers.reduce((acc, answer) => {
-      return acc + (answer.selectedOption.isCorrect ? 1 : 0);
+      if (answer.selectedOption && answer.selectedOption.isCorrect) {
+        return acc + 1;
+      }
+      return acc;
     }, 0);
 
     return NextResponse.json({
@@ -128,26 +135,46 @@ export async function GET(
           description: submission.exerciseList.description,
           shareCode: submission.exerciseList.shareCode,
           teacher: submission.exerciseList.teacher,
-          questions: submission.exerciseList.questions,
+          questions: submission.exerciseList.questions.map((q) => ({
+            id: q.id,
+            title: q.title,
+            type: q.type,
+            order: q.order,
+            options: q.options,
+          })),
         },
-        answers: submission.answers.map((answer) => ({
-          questionId: answer.questionId,
-          question: {
-            id: answer.question.id,
-            title: answer.question.title,
-            order: answer.question.order,
-            options: answer.question.options,
-          },
-          selectedOptionId: answer.selectedOptionId,
-          selectedOption: {
-            id: answer.selectedOption.id,
-            label: answer.selectedOption.label,
-            isCorrect: answer.selectedOption.isCorrect,
-          },
-          isCorrect: answer.selectedOption.isCorrect,
-          correctOptionId:
-            answer.question.options.find((opt) => opt.isCorrect)?.id || "",
-        })),
+        answers: submission.answers.map((answer) => {
+          const question = submission.exerciseList.questions.find(
+            (q) => q.id === answer.questionId
+          );
+          const isOpenEnded = question?.type === QuestionType.OPEN_ENDED;
+
+          return {
+            questionId: answer.questionId,
+            question: {
+              id: answer.question.id,
+              title: answer.question.title,
+              type: answer.question.type,
+              order: answer.question.order,
+              options: answer.question.options,
+            },
+            selectedOptionId: answer.selectedOptionId || undefined,
+            selectedOption: answer.selectedOption
+              ? {
+                  id: answer.selectedOption.id,
+                  label: answer.selectedOption.label,
+                  isCorrect: answer.selectedOption.isCorrect,
+                }
+              : undefined,
+            textAnswer: answer.textAnswer || undefined,
+            isCorrect: isOpenEnded
+              ? undefined
+              : answer.selectedOption?.isCorrect || false,
+            correctOptionId: isOpenEnded
+              ? undefined
+              : answer.question.options.find((opt) => opt.isCorrect)?.id || "",
+          };
+        }),
       },
     });
   } catch (error) {

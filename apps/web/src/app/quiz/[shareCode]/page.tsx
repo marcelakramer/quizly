@@ -30,46 +30,8 @@ import { api } from "@/lib/api";
 import { LoadingSpinner, LoadingIcon } from "@/components/LoadingIcon";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { UserRole } from "@teachy/db";
-
-type QuizStep = "intro" | "quiz" | "complete";
-
-interface QuizQuestion {
-  id: string;
-  title: string;
-  order: number;
-  options: Array<{
-    id: string;
-    label: string;
-    isCorrect: boolean;
-  }>;
-}
-
-interface QuizList {
-  id: string;
-  title: string;
-  description: string | null;
-  questions: QuizQuestion[];
-  teacher: {
-    id: string;
-    name: string;
-    email: string;
-  };
-}
-
-interface SubmissionResult {
-  id: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-  createdAt?: Date;
-  answers: Array<{
-    questionId: string;
-    selectedOptionId: string;
-    isCorrect: boolean;
-    correctOptionId: string;
-  }>;
-}
+import { UserRole, QuestionType } from "@teachy/db";
+import { QuizStep, QuizList, SubmissionResult } from "@/types";
 
 export default function StudentQuiz() {
   const params = useParams();
@@ -83,6 +45,7 @@ export default function StudentQuiz() {
   );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [submissionResult, setSubmissionResult] =
     useState<SubmissionResult | null>(null);
   const [list, setList] = useState<QuizList | null>(null);
@@ -184,6 +147,7 @@ export default function StudentQuiz() {
 
   const handleStartQuiz = () => {
     setAnswers({});
+    setTextAnswers({});
     setCurrentQuestionIndex(0);
     setSubmissionResult(null);
     setStep("quiz");
@@ -193,9 +157,20 @@ export default function StudentQuiz() {
     setAnswers({ ...answers, [currentQuestion.id]: optionId });
   };
 
+  const handleTextAnswerChange = (text: string) => {
+    setTextAnswers({ ...textAnswers, [currentQuestion.id]: text });
+  };
+
   const handleNext = () => {
-    if (!answers[currentQuestion.id]) {
-      toast.error("Please select an answer.");
+    const isOpenEnded = currentQuestion.type === QuestionType.OPEN_ENDED;
+    const hasAnswer = isOpenEnded
+      ? textAnswers[currentQuestion.id]?.trim()
+      : answers[currentQuestion.id];
+
+    if (!hasAnswer) {
+      toast.error(
+        isOpenEnded ? "Please provide an answer." : "Please select an answer."
+      );
       return;
     }
     if (currentQuestionIndex < list.questions.length - 1) {
@@ -210,8 +185,15 @@ export default function StudentQuiz() {
   };
 
   const handleSubmit = async () => {
-    if (!answers[currentQuestion.id]) {
-      toast.error("Please select an answer.");
+    const isOpenEnded = currentQuestion.type === QuestionType.OPEN_ENDED;
+    const hasAnswer = isOpenEnded
+      ? textAnswers[currentQuestion.id]?.trim()
+      : answers[currentQuestion.id];
+
+    if (!hasAnswer) {
+      toast.error(
+        isOpenEnded ? "Please provide an answer." : "Please select an answer."
+      );
       return;
     }
 
@@ -230,10 +212,15 @@ export default function StudentQuiz() {
         throw new Error("Not authenticated");
       }
 
-      const answerArray = list.questions.map((q) => ({
-        questionId: q.id,
-        selectedOptionId: answers[q.id] || "",
-      }));
+      const answerArray = list.questions.map((q) => {
+        const isQuestionOpenEnded = q.type === QuestionType.OPEN_ENDED;
+        return {
+          questionId: q.id,
+          ...(isQuestionOpenEnded
+            ? { textAnswer: textAnswers[q.id] || "" }
+            : { selectedOptionId: answers[q.id] || "" }),
+        };
+      });
 
       const { submission } = await api.quiz.submit(
         idToken,
@@ -414,7 +401,8 @@ export default function StudentQuiz() {
                 const answer = submissionResult.answers.find(
                   (a) => a.questionId === question.id
                 );
-                const isCorrect = answer?.isCorrect || false;
+                const isOpenEnded = question.type === QuestionType.OPEN_ENDED;
+                const isCorrect = answer?.isCorrect;
                 const selectedOption = question.options.find(
                   (o) => o.id === answer?.selectedOptionId
                 );
@@ -426,11 +414,17 @@ export default function StudentQuiz() {
                   <div
                     key={question.id}
                     className={`rounded-lg p-3 text-left text-sm ${
-                      isCorrect ? "bg-success/10" : "bg-destructive/10"
+                      isOpenEnded
+                        ? "bg-success/10"
+                        : isCorrect
+                          ? "bg-success/10"
+                          : "bg-destructive/10"
                     }`}
                   >
                     <div className="flex items-start gap-2">
-                      {isCorrect ? (
+                      {isOpenEnded ? (
+                        <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                      ) : isCorrect ? (
                         <CheckCircle className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
                       ) : (
                         <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -439,12 +433,28 @@ export default function StudentQuiz() {
                         <p className="font-medium text-foreground">
                           Q{index + 1}: {question.title}
                         </p>
-                        {!isCorrect && (
+                        {isOpenEnded ? (
                           <div className="mt-1 text-muted-foreground space-y-1">
-                            <p>Your answer: {selectedOption?.label}</p>
-                            <p className="text-success">
-                              Correct: {correctOption?.label}
+                            <p>
+                              Your answer:{" "}
+                              {answer?.textAnswer || "No answer provided"}
                             </p>
+                          </div>
+                        ) : (
+                          <div className="mt-1 text-muted-foreground space-y-1">
+                            <p
+                              className={
+                                isCorrect ? "text-success" : "text-destructive"
+                              }
+                            >
+                              Your answer:{" "}
+                              {selectedOption?.label || "No answer provided"}
+                            </p>
+                            {!isCorrect && correctOption && (
+                              <p className="text-success">
+                                Correct: {correctOption.label}
+                              </p>
+                            )}
                           </div>
                         )}
                       </div>
@@ -488,31 +498,50 @@ export default function StudentQuiz() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <RadioGroup
-              value={answers[currentQuestion.id] || ""}
-              onValueChange={handleSelectAnswer}
-              className="space-y-3"
-            >
-              {currentQuestion.options.map((option) => (
-                <div
-                  key={option.id}
-                  className={`flex items-center space-x-3 rounded-lg border-2 p-4 transition-all cursor-pointer ${
-                    answers[currentQuestion.id] === option.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                  onClick={() => handleSelectAnswer(option.id)}
+            {currentQuestion.type === QuestionType.OPEN_ENDED ? (
+              <div className="space-y-2">
+                <Label
+                  htmlFor="text-answer"
+                  className="block text-sm font-medium"
                 >
-                  <RadioGroupItem value={option.id} id={option.id} />
-                  <Label
-                    htmlFor={option.id}
-                    className="flex-1 cursor-pointer font-normal text-foreground"
+                  Your Answer
+                </Label>
+                <textarea
+                  id="text-answer"
+                  value={textAnswers[currentQuestion.id] || ""}
+                  onChange={(e) => handleTextAnswerChange(e.target.value)}
+                  placeholder="Type your answer here..."
+                  rows={6}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                />
+              </div>
+            ) : (
+              <RadioGroup
+                value={answers[currentQuestion.id] || ""}
+                onValueChange={handleSelectAnswer}
+                className="space-y-3"
+              >
+                {currentQuestion.options.map((option) => (
+                  <div
+                    key={option.id}
+                    className={`flex items-center space-x-3 rounded-lg border-2 p-4 transition-all cursor-pointer ${
+                      answers[currentQuestion.id] === option.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                    onClick={() => handleSelectAnswer(option.id)}
                   >
-                    {option.label}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+                    <RadioGroupItem value={option.id} id={option.id} />
+                    <Label
+                      htmlFor={option.id}
+                      className="flex-1 cursor-pointer font-normal text-foreground"
+                    >
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            )}
           </CardContent>
         </Card>
 

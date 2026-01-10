@@ -25,18 +25,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-
-interface Option {
-  label: string;
-  isCorrect: boolean;
-}
-
-interface Question {
-  id: string;
-  title: string;
-  options: Option[];
-  order: number;
-}
+import { Question } from "@/types";
 
 export default function CreateList() {
   const router = useRouter();
@@ -136,6 +125,7 @@ export default function CreateList() {
         description: description.trim() || null,
         questions: questions.map((q) => ({
           title: q.title,
+          type: q.type,
           options: q.options,
           order: q.order,
         })),
