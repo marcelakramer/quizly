@@ -12,7 +12,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Teachy Assignment Platform",
+  title: "Quizly Assignment Platform",
   description: "Create and share exercise lists with students",
 };
 

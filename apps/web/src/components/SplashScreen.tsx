@@ -11,7 +11,7 @@ export function SplashScreen() {
             <BookOpen className="h-12 w-12 text-primary-foreground animate-book-pages" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Teachy</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Quizly</h2>
         <p className="text-sm text-muted-foreground">Loading...</p>
       </div>
     </div>

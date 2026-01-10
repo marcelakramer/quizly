@@ -20,12 +20,14 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [dbUser, setDbUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
+        setLoadingUser(true);
         try {
           const auth = getAuthInstance();
           const idToken = await auth.currentUser?.getIdToken();
@@ -35,9 +37,12 @@ export function Header() {
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
+        } finally {
+          setLoadingUser(false);
         }
       } else {
         setDbUser(null);
+        setLoadingUser(false);
       }
     };
 
@@ -80,7 +85,7 @@ export function Header() {
     return null;
   }
 
-  const initials = dbUser?.name ? getInitials(dbUser.name) : "U";
+  const initials = dbUser?.name ? getInitials(dbUser.name) : null;
 
   return (
     <header className="border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
@@ -92,10 +97,10 @@ export function Header() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
             <BookOpen className="h-5 w-5 text-white" />
           </div>
-          <span className="text-gray-900">Teachy</span>
+          <span className="text-gray-900">Quizly</span>
         </Link>
 
-        {user ? (
+        {user && !loadingUser && initials ? (
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}

@@ -95,6 +95,217 @@ export const api = {
           }
         );
       },
+      getSubmissions: async (
+        idToken: string,
+        listId: string
+      ): Promise<{
+        list: {
+          id: string;
+          title: string;
+          description: string | null;
+          shareCode: string;
+          questions: Array<{ id: string }>;
+        };
+        submissions: Array<{
+          id: string;
+          studentName: string;
+          studentEmail: string;
+          score: number;
+          totalQuestions: number;
+          percentage: number;
+          submittedAt: Date;
+        }>;
+      }> => {
+        return fetchWithAuth<{
+          list: {
+            id: string;
+            title: string;
+            description: string | null;
+            shareCode: string;
+            questions: Array<{ id: string }>;
+          };
+          submissions: Array<{
+            id: string;
+            studentName: string;
+            studentEmail: string;
+            score: number;
+            totalQuestions: number;
+            percentage: number;
+            submittedAt: Date;
+          }>;
+        }>(`/api/exercises/submissions/lists/${listId}`, idToken, {
+          method: "GET",
+        });
+      },
+    },
+    submissions: {
+      getById: async (
+        idToken: string,
+        submissionId: string
+      ): Promise<{
+        submission: {
+          id: string;
+          score: number;
+          totalQuestions: number;
+          correctAnswers: number;
+          createdAt: Date;
+          student: {
+            id: string;
+            name: string;
+            email: string;
+          };
+          exerciseList: {
+            id: string;
+            title: string;
+            description: string | null;
+            shareCode: string;
+            teacher: {
+              id: string;
+              name: string;
+              email: string;
+            };
+            questions: Array<{
+              id: string;
+              title: string;
+              order: number;
+              options: Array<{
+                id: string;
+                label: string;
+                isCorrect: boolean;
+              }>;
+            }>;
+          };
+          answers: Array<{
+            questionId: string;
+            question: {
+              id: string;
+              title: string;
+              order: number;
+              options: Array<{
+                id: string;
+                label: string;
+                isCorrect: boolean;
+              }>;
+            };
+            selectedOptionId: string;
+            selectedOption: {
+              id: string;
+              label: string;
+              isCorrect: boolean;
+            };
+            isCorrect: boolean;
+            correctOptionId: string;
+          }>;
+        };
+      }> => {
+        return fetchWithAuth<{
+          submission: {
+            id: string;
+            score: number;
+            totalQuestions: number;
+            correctAnswers: number;
+            createdAt: Date;
+            student: {
+              id: string;
+              name: string;
+              email: string;
+            };
+            exerciseList: {
+              id: string;
+              title: string;
+              description: string | null;
+              shareCode: string;
+              teacher: {
+                id: string;
+                name: string;
+                email: string;
+              };
+              questions: Array<{
+                id: string;
+                title: string;
+                order: number;
+                options: Array<{
+                  id: string;
+                  label: string;
+                  isCorrect: boolean;
+                }>;
+              }>;
+            };
+            answers: Array<{
+              questionId: string;
+              question: {
+                id: string;
+                title: string;
+                order: number;
+                options: Array<{
+                  id: string;
+                  label: string;
+                  isCorrect: boolean;
+                }>;
+              };
+              selectedOptionId: string;
+              selectedOption: {
+                id: string;
+                label: string;
+                isCorrect: boolean;
+              };
+              isCorrect: boolean;
+              correctOptionId: string;
+            }>;
+          };
+        }>(`/api/exercises/submissions/${submissionId}`, idToken, {
+          method: "GET",
+        });
+      },
+    },
+    student: {
+      getAll: async (
+        idToken: string
+      ): Promise<{
+        submissions: Array<{
+          id: string;
+          score: number;
+          totalQuestions: number;
+          correctAnswers: number;
+          createdAt: Date;
+          exerciseList: {
+            id: string;
+            title: string;
+            description: string | null;
+            shareCode: string;
+            teacher: {
+              id: string;
+              name: string;
+              email: string;
+            };
+            questionCount: number;
+          };
+        }>;
+      }> => {
+        return fetchWithAuth<{
+          submissions: Array<{
+            id: string;
+            score: number;
+            totalQuestions: number;
+            correctAnswers: number;
+            createdAt: Date;
+            exerciseList: {
+              id: string;
+              title: string;
+              description: string | null;
+              shareCode: string;
+              teacher: {
+                id: string;
+                name: string;
+                email: string;
+              };
+              questionCount: number;
+            };
+          }>;
+        }>("/api/exercises/submissions/student", idToken, {
+          method: "GET",
+        });
+      },
     },
   },
   quiz: {
@@ -220,7 +431,7 @@ export const api = {
             correctOptionId: string;
           }>;
         };
-      }>(`/api/exercises/submissions/${shareCode}`, idToken, {
+      }>(`/api/exercises/submissions/check/${shareCode}`, idToken, {
         method: "GET",
       });
     },

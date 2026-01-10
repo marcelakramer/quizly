@@ -63,7 +63,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, pathname, router, redirecting]);
 
-  if (loading || redirecting) {
+  if (loading) {
+    return <SplashScreen />;
+  }
+
+  if (redirecting && !user) {
     return <SplashScreen />;
   }
 
