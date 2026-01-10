@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { QuestionType } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
+import { getResultMessage } from "@/lib/utils/exercise";
 
 export default function StudentResults() {
   const params = useParams();
@@ -104,6 +105,7 @@ export default function StudentResults() {
   }
 
   const percentage = submission.score;
+  const result = getResultMessage(percentage);
   const sortedAnswers = [...submission.answers].sort(
     (a, b) => a.question.order - b.question.order
   );
@@ -132,6 +134,19 @@ export default function StudentResults() {
             </p>
           )}
         </div>
+
+        <Card
+          className="glass-card mb-8 opacity-0 animate-fade-up"
+          style={{ animationDelay: "0.15s" }}
+        >
+          <CardContent className="pt-6 pb-6 text-center">
+            <div className="text-5xl mb-3">{result.emoji}</div>
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              {result.title}
+            </h2>
+            <p className="text-muted-foreground">{result.message}</p>
+          </CardContent>
+        </Card>
 
         <div
           className="grid gap-4 md:grid-cols-3 mb-8 opacity-0 animate-fade-up"

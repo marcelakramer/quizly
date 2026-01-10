@@ -32,6 +32,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { UserRole, QuestionType } from "@teachy/db";
 import { QuizStep, QuizList, SubmissionResult } from "@/types";
+import { getResultMessage } from "@/lib/utils/exercise";
 
 export default function StudentQuiz() {
   const params = useParams();
@@ -362,28 +363,19 @@ export default function StudentQuiz() {
 
   if (step === "complete" && submissionResult) {
     const percentage = submissionResult.score;
-    const emoji =
-      percentage >= 80
-        ? "🎉"
-        : percentage >= 60
-          ? "👍"
-          : percentage >= 40
-            ? "💪"
-            : "📚";
+    const result = getResultMessage(percentage);
 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="glass-card max-w-lg w-full opacity-0 animate-scale-in">
           <CardContent className="pt-8 pb-8 text-center space-y-6">
-            <div className="text-6xl">{emoji}</div>
+            <div className="text-6xl">{result.emoji}</div>
 
             <div>
               <h1 className="text-2xl font-bold text-foreground">
-                Quiz Complete!
+                {result.title}
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Well done, {dbUser.name}!
-              </p>
+              <p className="text-muted-foreground mt-1">{result.message}</p>
             </div>
 
             <div className="py-6">
