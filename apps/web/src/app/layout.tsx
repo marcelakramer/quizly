@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import { Header } from "@/components/Header";
+import { PublicRouteGuard } from "@/components/PublicRouteGuard";
 import { Toaster } from "sonner";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -24,8 +25,10 @@ export default function RootLayout({
     <html lang="en" className={plusJakartaSans.variable}>
       <body>
         <AuthProvider>
-          <Header />
-          {children}
+          <PublicRouteGuard>
+            <Header />
+            {children}
+          </PublicRouteGuard>
           <Toaster position="top-right" richColors />
         </AuthProvider>
       </body>
