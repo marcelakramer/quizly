@@ -42,10 +42,14 @@ async function fetchWithAuth<T>(
 
 export const api = {
   auth: {
-    sync: async (idToken: string, role: UserRole): Promise<{ user: User }> => {
+    sync: async (
+      idToken: string,
+      role: UserRole,
+      name?: string
+    ): Promise<{ user: User }> => {
       return fetchWithAuth<{ user: User }>("/api/auth/sync", idToken, {
         method: "POST",
-        body: JSON.stringify({ role }),
+        body: JSON.stringify({ role, name }),
       });
     },
     me: async (idToken: string): Promise<{ user: User }> => {

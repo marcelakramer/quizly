@@ -200,6 +200,21 @@
 .animate-spin-dash {
   animation: spin-dash 1.5s ease-in-out infinite;
 }
+
+@keyframes logoPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.animate-logo-pulse {
+  animation: logoPulse 2s ease-in-out infinite;
+}
 [data-sonner-toast] {
   border-radius: var(--radius) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;

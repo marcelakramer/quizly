@@ -9,8 +9,8 @@ import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { User } from "@teachy/db";
-import { BookOpen } from "lucide-react";
 import { getInitials } from "@/lib/utils/user";
+import { Logo } from "./Logo";
 
 const publicRoutes = ["/login", "/register"];
 const publicRoutePrefixes = ["/quiz"];
@@ -30,7 +30,8 @@ export function Header() {
         setLoadingUser(true);
         try {
           const auth = getAuthInstance();
-          const idToken = await auth.currentUser?.getIdToken();
+          // Force token refresh to get latest user data
+          const idToken = await auth.currentUser?.getIdToken(true);
           if (idToken) {
             const { user: userData } = await api.auth.me(idToken);
             setDbUser(userData);
@@ -47,7 +48,7 @@ export function Header() {
     };
 
     fetchUserData();
-  }, [user]);
+  }, [user, pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -94,9 +95,7 @@ export function Header() {
           href="/"
           className="flex items-center gap-2 font-semibold text-xl"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
-            <BookOpen className="h-5 w-5 text-white" />
-          </div>
+          <Logo width={32} height={32} />
           <span className="text-gray-900">Quizly</span>
         </Link>
 

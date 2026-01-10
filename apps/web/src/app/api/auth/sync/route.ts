@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const syncSchema = z.object({
   role: z.enum(["TEACHER", "STUDENT"]),
+  name: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { role } = syncSchema.parse(body);
+    const { role, name: providedName } = syncSchema.parse(body);
 
     let user = await prisma.user.findUnique({
       where: { email },
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
       user = await prisma.user.create({
         data: {
           email,
-          name: name || email.split("@")[0],
+          name: providedName || name || email.split("@")[0],
           role: role as UserRole,
         },
       });
