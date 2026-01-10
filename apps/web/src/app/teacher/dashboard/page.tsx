@@ -7,6 +7,7 @@ import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { ExerciseListCard } from "@/components/ExerciseListCard";
 import { LoadingSpinner } from "@/components/LoadingIcon";
+import { EmptyState } from "@/components/EmptyState";
 import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";
 
@@ -63,22 +64,14 @@ export default function TeacherDashboard() {
         </div>
 
         {exerciseLists.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center opacity-0 animate-fade-up">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-              <ClipboardList className="h-8 w-8 text-primary" />
-            </div>
-            <h2 className="text-xl font-semibold">No exercise lists yet</h2>
-            <p className="mt-2 text-muted-foreground max-w-sm">
-              Create your first exercise list to start assessing your students
-            </p>
-            <Link
-              href="/teacher/exercise-lists/create"
-              className="mt-6 inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Your First List
-            </Link>
-          </div>
+          <EmptyState
+            icon={ClipboardList}
+            title="No exercise lists yet"
+            description="Create your first exercise list to start assessing your students"
+            buttonText="Create Your First List"
+            buttonHref="/teacher/exercise-lists/create"
+            buttonIcon={Plus}
+          />
         ) : (
           <div className="grid gap-4">
             {exerciseLists.map((list, index) => (

@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingIcon";
+import { EmptyState } from "@/components/EmptyState";
 import { ArrowLeft, Users, Trophy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -191,14 +192,12 @@ export default function ViewResults() {
           </CardHeader>
           <CardContent>
             {submissions.length === 0 ? (
-              <div className="text-center py-8">
-                <Users className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">No submissions yet</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Share the quiz link with your students to start receiving
-                  responses
-                </p>
-              </div>
+              <EmptyState
+                icon={Users}
+                title="No submissions yet"
+                description="Share the quiz link with your students to start receiving responses"
+                className="py-8"
+              />
             ) : (
               <div className="space-y-3">
                 {submissions.map((submission, index) => {

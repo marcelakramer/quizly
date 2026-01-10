@@ -21,6 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import { QuestionForm } from "@/components/QuestionForm";
 import { QuestionPreview } from "@/components/QuestionPreview";
+import { EmptyState } from "@/components/EmptyState";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
@@ -363,14 +364,12 @@ export default function EditList() {
 
             {questions.length === 0 ? (
               <div className="glass-card rounded-lg p-6">
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
-                    <FileText className="h-6 w-6 text-muted-foreground" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    No questions yet. Add your first question using the form.
-                  </p>
-                </div>
+                <EmptyState
+                  icon={FileText}
+                  title="No questions yet"
+                  description="Add your first question using the form."
+                  className="py-12"
+                />
               </div>
             ) : (
               <DndContext

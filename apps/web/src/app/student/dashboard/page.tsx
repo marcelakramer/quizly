@@ -31,6 +31,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { LoadingSpinner } from "@/components/LoadingIcon";
+import { EmptyState } from "@/components/EmptyState";
 
 import { StudentSubmission } from "@/types";
 
@@ -222,13 +223,12 @@ export default function StudentDashboard() {
               </CardHeader>
               <CardContent>
                 {submissions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Award className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-                    <p className="text-muted-foreground">No data yet</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Complete quizzes to see your performance
-                    </p>
-                  </div>
+                  <EmptyState
+                    icon={Award}
+                    title="No data yet"
+                    description="Complete quizzes to see your performance"
+                    className="py-8"
+                  />
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="glass-card rounded-lg p-3 flex items-center gap-3">
@@ -313,13 +313,12 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent>
               {submissions.length === 0 ? (
-                <div className="text-center py-8">
-                  <FileText className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <p className="text-muted-foreground">No submissions yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Complete a quiz to see your results here
-                  </p>
-                </div>
+                <EmptyState
+                  icon={FileText}
+                  title="No submissions yet"
+                  description="Complete a quiz to see your results here"
+                  className="py-8"
+                />
               ) : (
                 <div className="space-y-3">
                   {submissions.map((submission, index) => {
