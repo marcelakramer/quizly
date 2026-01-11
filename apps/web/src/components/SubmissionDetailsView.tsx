@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
 import { QuestionType } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
 import { getResultMessage } from "@/lib/utils/exercise";
+import { formatDateShort, formatTime } from "@/lib/utils/date";
 
 interface SubmissionDetailsViewProps {
   submission: SubmissionDetail;
@@ -143,20 +144,10 @@ export function SubmissionDetailsView({
                 </div>
                 <div>
                   <p className="text-base font-semibold text-foreground">
-                    {new Date(submission.createdAt).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      }
-                    )}
+                    {formatDateShort(submission.createdAt)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(submission.createdAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatTime(submission.createdAt)}
                   </p>
                 </div>
               </div>

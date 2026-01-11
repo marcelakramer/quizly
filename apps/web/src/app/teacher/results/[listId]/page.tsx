@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
+import { formatDate, formatTime } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResultsSkeleton } from "@/components/ResultsSkeleton";
@@ -222,16 +223,8 @@ export default function ViewResults() {
                             {submission.studentName}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            {new Date(
-                              submission.submittedAt
-                            ).toLocaleDateString()}{" "}
-                            at{" "}
-                            {new Date(
-                              submission.submittedAt
-                            ).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {formatDate(submission.submittedAt)} at{" "}
+                            {formatTime(submission.submittedAt)}
                           </p>
                         </div>
                       </div>

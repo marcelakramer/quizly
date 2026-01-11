@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { formatDateTimeLong } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -298,15 +299,9 @@ export default function StudentQuiz() {
                     </p>
                     <p className="text-xs text-muted-foreground mt-3">
                       Submitted on{" "}
-                      {new Date(
+                      {formatDateTimeLong(
                         existingSubmission.createdAt || new Date()
-                      ).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      )}
                     </p>
                   </div>
                   <Button

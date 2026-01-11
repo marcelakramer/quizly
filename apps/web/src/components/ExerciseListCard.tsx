@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ExerciseListWithRelations } from "@/types";
+import { formatDateShort } from "@/lib/utils/date";
 
 interface ExerciseListCardProps {
   list: ExerciseListWithRelations;
@@ -61,13 +62,7 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
             <span>•</span>
             <span>{list.submissions?.length || 0} submissions</span>
             <span>•</span>
-            <span>
-              {new Date(list.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </span>
+            <span>{formatDateShort(list.createdAt)}</span>
           </div>
           <div className="flex items-center gap-2">
             {list.submissions?.length === 0 && (

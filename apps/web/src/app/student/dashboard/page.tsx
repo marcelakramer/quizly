@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { formatDate } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import {
@@ -355,9 +356,7 @@ export default function StudentDashboard() {
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                {new Date(
-                                  submission.createdAt
-                                ).toLocaleDateString()}
+                                {formatDate(submission.createdAt)}
                               </span>
                             </div>
                           </div>
