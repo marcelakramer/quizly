@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Logo } from "@/components/Logo";
+import { Logo } from "@/components/common";
 import Link from "next/link";
 
 interface AuthHeaderProps {

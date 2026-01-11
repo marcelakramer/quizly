@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 import { getInitials } from "@/lib/utils/user";
-import { Logo } from "./Logo";
+import { Logo } from "@/components/common";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 

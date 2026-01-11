@@ -22,10 +22,10 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { QuestionForm } from "@/components/QuestionForm";
-import { QuestionPreview } from "@/components/QuestionPreview";
-import { EmptyState } from "@/components/EmptyState";
-import { ExerciseListFormSkeleton } from "@/components/ExerciseListFormSkeleton";
+import { QuestionForm } from "./QuestionForm";
+import { QuestionPreview } from "./QuestionPreview";
+import { EmptyState } from "@/components/common";
+import { ExerciseListFormSkeleton } from "./ExerciseListFormSkeleton";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";

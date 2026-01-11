@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { PageContainer } from "@/components/PageContainer";
+import { PageContainer } from "@/components/layout";
 
 interface SubmissionDetailsSkeletonProps {
   showResultCard?: boolean;

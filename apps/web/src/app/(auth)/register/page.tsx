@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup } from "@/components/ui/radio-group";
-import { RoleCard } from "@/components/RoleCard";
+import { RoleCard } from "@/components/common";
 import {
   AuthPageLayout,
   AuthHeader,

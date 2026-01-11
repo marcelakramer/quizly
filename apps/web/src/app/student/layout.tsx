@@ -1,4 +1,4 @@
-import { ProtectedLayout } from "@/components/ProtectedLayout";
+import { ProtectedLayout } from "@/components/layout";
 import { UserRole } from "@teachy/db";
 
 export default function StudentLayout({

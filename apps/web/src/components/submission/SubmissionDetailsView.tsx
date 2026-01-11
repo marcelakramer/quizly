@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
-import { PageContainer } from "@/components/PageContainer";
-import { StatCard } from "@/components/StatCard";
+import { AnimatedNumber } from "@/components/common";
+import { PageContainer } from "@/components/layout";
+import { StatCard } from "@/components/common";
 import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
 import { QuestionType } from "@teachy/db";
 import { SubmissionDetail } from "@/types";

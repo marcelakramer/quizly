@@ -8,10 +8,8 @@ import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Card, CardContent } from "@/components/ui/card";
-import { PageHeader } from "@/components/PageHeader";
-import { IconCardHeader } from "@/components/IconCardHeader";
-import { StatCard } from "@/components/StatCard";
-import { PageContainer } from "@/components/PageContainer";
+import { PageHeader, PageContainer } from "@/components/layout";
+import { IconCardHeader, StatCard } from "@/components/common";
 import {
   Hash,
   ArrowRight,
@@ -29,9 +27,8 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { StudentDashboardSkeleton } from "@/components/StudentDashboardSkeleton";
-import { EmptyState } from "@/components/EmptyState";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
+import { StudentDashboardSkeleton } from "@/components/dashboard";
+import { EmptyState, AnimatedNumber } from "@/components/common";
 
 import { StudentSubmission } from "@/types";
 

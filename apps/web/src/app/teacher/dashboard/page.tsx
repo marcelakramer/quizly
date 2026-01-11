@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
-import { ExerciseListCard } from "@/components/ExerciseListCard";
-import { ExerciseListCardSkeletons } from "@/components/ExerciseListCardSkeletons";
-import { EmptyState } from "@/components/EmptyState";
-import { PageHeader } from "@/components/PageHeader";
-import { PageContainer } from "@/components/PageContainer";
+import {
+  ExerciseListCard,
+  ExerciseListCardSkeletons,
+} from "@/components/exercise";
+import { EmptyState } from "@/components/common";
+import { PageHeader, PageContainer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";

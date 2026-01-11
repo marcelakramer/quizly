@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getDashboardPathForRole } from "@/lib/utils/role";
-import { SplashScreen } from "@/components/SplashScreen";
+import { SplashScreen } from "@/components/common";
 
 export default function AuthLayout({
   children,

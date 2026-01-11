@@ -10,7 +10,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { QuizInfoCard } from "./QuizInfoCard";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
+import { AnimatedNumber } from "@/components/common";
 import {
   ArrowRight,
   CheckCircle,

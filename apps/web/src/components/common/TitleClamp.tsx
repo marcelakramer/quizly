@@ -7,7 +7,7 @@ interface TitleClampProps {
   lines?: number;
 }
 
-export default function TitleClamp({ title, lines = 3 }: TitleClampProps) {
+export function TitleClamp({ title, lines = 3 }: TitleClampProps) {
   const ref = useRef<HTMLParagraphElement | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [showToggle, setShowToggle] = useState(false);

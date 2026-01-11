@@ -6,9 +6,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { ExerciseListForm } from "@/components/ExerciseListForm";
-import { ExerciseListFormSkeleton } from "@/components/ExerciseListFormSkeleton";
-import { PageContainer } from "@/components/PageContainer";
+import {
+  ExerciseListForm,
+  ExerciseListFormSkeleton,
+} from "@/components/exercise";
+import { PageContainer } from "@/components/layout";
 import { Question } from "@/types";
 
 export default function EditList() {

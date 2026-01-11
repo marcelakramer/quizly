@@ -7,13 +7,9 @@ import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
-import { ResultsSkeleton } from "@/components/ResultsSkeleton";
-import { EmptyState } from "@/components/EmptyState";
-import { PageContainer } from "@/components/PageContainer";
-import { PageHeader } from "@/components/PageHeader";
-import { StatCard } from "@/components/StatCard";
-import { SubmissionListItem } from "@/components/SubmissionListItem";
+import { AnimatedNumber, EmptyState, StatCard } from "@/components/common";
+import { ResultsSkeleton, SubmissionListItem } from "@/components/submission";
+import { PageContainer, PageHeader } from "@/components/layout";
 import { ArrowLeft, Users, Trophy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -118,7 +114,7 @@ export default function ViewResults() {
 
       <PageHeader
         title={list.title}
-        description={list.description}
+        description={list.description ?? undefined}
         align="start"
         animationDelay="0.1s"
         actions={

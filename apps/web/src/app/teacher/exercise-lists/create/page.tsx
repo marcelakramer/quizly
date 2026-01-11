@@ -1,7 +1,7 @@
 "use client";
 
-import { ExerciseListForm } from "@/components/ExerciseListForm";
-import { PageContainer } from "@/components/PageContainer";
+import { ExerciseListForm } from "@/components/exercise";
+import { PageContainer } from "@/components/layout";
 
 export default function CreateList() {
   return (

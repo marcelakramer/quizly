@@ -5,9 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
-import { SubmissionDetailsSkeleton } from "@/components/SubmissionDetailsSkeleton";
-import { SubmissionDetailsView } from "@/components/SubmissionDetailsView";
-import { ErrorStateCard } from "@/components/ErrorStateCard";
+import {
+  SubmissionDetailsSkeleton,
+  SubmissionDetailsView,
+} from "@/components/submission";
+import { ErrorStateCard } from "@/components/common";
 import { User, ShieldX, FileQuestion } from "lucide-react";
 import { UserRole } from "@teachy/db";
 import { SubmissionDetail } from "@/types";

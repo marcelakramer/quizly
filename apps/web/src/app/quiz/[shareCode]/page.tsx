@@ -9,8 +9,7 @@ import { getAuthInstance } from "@teachy/firebase";
 import { UserRole, QuestionType } from "@teachy/db";
 import { QuizStep, QuizList, SubmissionResult } from "@/types";
 import { useQuizValidation } from "@/hooks/use-quiz-validation";
-import { ErrorStateCard } from "@/components/ErrorStateCard";
-import { QuizIntroSkeleton } from "@/components/QuizIntroSkeleton";
+import { ErrorStateCard, QuizIntroSkeleton } from "@/components/common";
 import {
   QuizIntroStep,
   QuizQuestionStep,

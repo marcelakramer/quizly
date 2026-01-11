@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { SplashScreen } from "@/components/SplashScreen";
+import { SplashScreen } from "@/components/common";
 import { UserRole } from "@teachy/db";
 import { toast } from "sonner";
 

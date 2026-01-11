@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
+import { AnimatedNumber } from "@/components/common";
 import { CheckCircle, XCircle } from "lucide-react";
 import { QuestionType } from "@teachy/db";
 import { QuizQuestion, SubmissionResult } from "@/types";

@@ -4,9 +4,9 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { usePathname } from "next/navigation";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
-import { Header } from "@/components/Header";
+import { Header } from "@/components/layout";
 import { Toaster } from "sonner";
-import { SplashScreen } from "@/components/SplashScreen";
+import { SplashScreen } from "@/components/common";
 import { useAuth } from "@/contexts/auth-context";
 
 const plusJakartaSans = Plus_Jakarta_Sans({

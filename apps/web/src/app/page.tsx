@@ -5,7 +5,7 @@ import { ClipboardList, Users, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRole } from "@teachy/db";
 import { Button } from "@/components/ui/button";
-import { FeatureCard } from "@/components/FeatureCard";
+import { FeatureCard } from "@/components/common";
 import { getDashboardPathForRole } from "@/lib/utils/role";
 
 export default function Home() {
