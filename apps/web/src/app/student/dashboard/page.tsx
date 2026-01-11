@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils/date";
+import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import {
@@ -320,12 +321,7 @@ export default function StudentDashboard() {
                 <div className="space-y-3">
                   {submissions.map((submission, index) => {
                     const percentage = submission.score;
-                    const scoreColorClass =
-                      percentage >= 70
-                        ? "text-success"
-                        : percentage >= 50
-                          ? "text-accent"
-                          : "text-destructive";
+                    const scoreColorClass = getScoreColorClass(percentage);
 
                     return (
                       <Link

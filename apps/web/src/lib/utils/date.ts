@@ -1,6 +1,7 @@
 /**
  * Format a date with full month name, day, year, and time
- * Example: "January 11, 2026, 02:30 PM"
+ * @param date - Date object or ISO date string to format
+ * @returns Formatted date string (e.g., "January 11, 2026, 02:30 PM")
  */
 export function formatDateTimeLong(date: Date | string): string {
   return new Date(date).toLocaleDateString("en-US", {
@@ -14,7 +15,8 @@ export function formatDateTimeLong(date: Date | string): string {
 
 /**
  * Format a date with short month name, day, and year
- * Example: "Jan 11, 2026"
+ * @param date - Date object or ISO date string to format
+ * @returns Formatted date string (e.g., "Jan 11, 2026")
  */
 export function formatDateShort(date: Date | string): string {
   return new Date(date).toLocaleDateString("en-US", {
@@ -26,7 +28,8 @@ export function formatDateShort(date: Date | string): string {
 
 /**
  * Format a date using default locale
- * Example: "1/11/2026"
+ * @param date - Date object or ISO date string to format
+ * @returns Formatted date string (e.g., "1/11/2026")
  */
 export function formatDate(date: Date | string): string {
   return new Date(date).toLocaleDateString();
@@ -34,7 +37,8 @@ export function formatDate(date: Date | string): string {
 
 /**
  * Format time only
- * Example: "02:30 PM"
+ * @param date - Date object or ISO date string to format
+ * @returns Formatted time string (e.g., "02:30 PM")
  */
 export function formatTime(date: Date | string): string {
   return new Date(date).toLocaleTimeString([], {

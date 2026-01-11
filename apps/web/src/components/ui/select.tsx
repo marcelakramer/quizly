@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ChevronDown, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 
 interface SelectOption {
   value: string;

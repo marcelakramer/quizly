@@ -1,3 +1,8 @@
+/**
+ * Get initials from a user's name
+ * @param name - The user's full name
+ * @returns Two-character uppercase initials (first and last name, or first two characters)
+ */
 export function getInitials(name: string): string {
   const parts = name.trim().split(" ");
   if (parts.length >= 2) {

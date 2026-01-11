@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { formatDate, formatTime } from "@/lib/utils/date";
+import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResultsSkeleton } from "@/components/ResultsSkeleton";
@@ -230,13 +231,7 @@ export default function ViewResults() {
                       </div>
                       <div className="text-right">
                         <p
-                          className={`text-lg font-bold ${
-                            percentage >= 70
-                              ? "text-success"
-                              : percentage >= 50
-                                ? "text-accent"
-                                : "text-destructive"
-                          }`}
+                          className={`text-lg font-bold ${getScoreColorClass(percentage)}`}
                         >
                           {submission.score}/{submission.totalQuestions}
                         </p>
