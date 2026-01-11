@@ -40,7 +40,7 @@ export default function TeacherDashboard() {
   }, [firebaseUser]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <div className="mb-8 flex items-center justify-between">
           <div className="opacity-0 animate-fade-up">

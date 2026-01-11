@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function ResultsSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <div className="mb-6 h-6 w-40 bg-muted rounded animate-pulse" />
 

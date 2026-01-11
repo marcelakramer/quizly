@@ -56,7 +56,7 @@ export default function EditList() {
 
   if (!firebaseUser) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-full bg-background">
         <main className="container py-8">
           <ExerciseListFormSkeleton showDeleteButton={true} />
         </main>
@@ -65,7 +65,7 @@ export default function EditList() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <ExerciseListForm mode="edit" listId={listId} onLoadData={loadData} />
       </main>

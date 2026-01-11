@@ -145,7 +145,7 @@ export default function SubmissionDetails() {
 
   if (!submission) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="flex-1 bg-background flex items-center justify-center p-4">
         <Card className="glass-card max-w-md w-full opacity-0 animate-scale-in">
           <CardContent className="pt-8 pb-8">
             <div className="text-center space-y-6">

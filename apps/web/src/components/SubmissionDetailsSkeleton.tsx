@@ -10,7 +10,7 @@ export function SubmissionDetailsSkeleton({
   showResultCard = false,
 }: SubmissionDetailsSkeletonProps = {}) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <div className="mb-6 h-6 w-32 bg-muted rounded animate-pulse" />
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex-1 bg-background flex items-center justify-center p-4">
       <div className="text-center opacity-0 animate-fade-up">
         <div className="flex justify-center mb-6">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">

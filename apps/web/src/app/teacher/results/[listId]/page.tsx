@@ -69,7 +69,7 @@ export default function ViewResults() {
 
   if (!list) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-full bg-background">
         <main className="container py-8">
           <div className="text-center py-16">
             <h1 className="text-2xl font-bold text-foreground">
@@ -108,7 +108,7 @@ export default function ViewResults() {
       : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <Button
           variant="tertiary"

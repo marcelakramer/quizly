@@ -20,7 +20,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     return <SplashScreen />;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 flex flex-col">{children}</main>
+    </div>
+  );
 }
 
 export default function RootLayout({
@@ -39,10 +44,7 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>
-          <LayoutContent>
-            <Header />
-            {children}
-          </LayoutContent>
+          <LayoutContent>{children}</LayoutContent>
           <Toaster position="top-right" richColors />
         </AuthProvider>
       </body>

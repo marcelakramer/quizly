@@ -121,7 +121,7 @@ export default function StudentDashboard() {
       : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <div className="mb-8 opacity-0 animate-fade-up">
           <h1 className="text-3xl font-bold text-foreground">My Activities</h1>

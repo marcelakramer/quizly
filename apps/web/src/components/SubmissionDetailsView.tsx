@@ -40,7 +40,7 @@ export function SubmissionDetailsView({
   const FirstCardIcon = firstCardContent.icon;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       <main className="container py-8">
         <Button
           variant="tertiary"

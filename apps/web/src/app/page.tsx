@@ -11,7 +11,7 @@ export default function Home() {
   const { firebaseUser, dbUser } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-full bg-background">
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28">
         <div className="mx-auto max-w-3xl text-center opacity-0 animate-fade-up">
