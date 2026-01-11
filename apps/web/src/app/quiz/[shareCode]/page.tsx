@@ -37,6 +37,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { api } from "@/lib/api";
 import { QuizIntroSkeleton } from "@/components/QuizIntroSkeleton";
 import { useAuth } from "@/contexts/auth-context";
@@ -325,11 +326,19 @@ export default function StudentQuiz() {
                   <div className="space-y-2 mb-4">
                     <p className="text-sm text-muted-foreground">Your score:</p>
                     <p className="text-3xl font-bold text-primary">
-                      {existingSubmission.correctAnswers}/
-                      {existingSubmission.totalQuestions}
+                      <AnimatedNumber
+                        value={existingSubmission.correctAnswers}
+                        delay={200}
+                      />
+                      /{existingSubmission.totalQuestions}
                     </p>
                     <p className="text-lg text-muted-foreground">
-                      {existingSubmission.score.toFixed(0)}% correct
+                      <AnimatedNumber
+                        value={existingSubmission.score}
+                        delay={300}
+                        suffix="%"
+                      />{" "}
+                      correct
                     </p>
                     <p className="text-xs text-muted-foreground mt-3">
                       Submitted on{" "}
@@ -422,26 +431,50 @@ export default function StudentQuiz() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="glass-card max-w-lg w-full opacity-0 animate-scale-in">
           <CardContent className="pt-8 pb-8 text-center space-y-6">
-            <div className="text-6xl">{result.emoji}</div>
+            <div
+              className="text-6xl opacity-0 animate-celebrate-bounce"
+              style={{ animationDelay: "0.3s" }}
+            >
+              {result.emoji}
+            </div>
 
-            <div>
+            <div
+              className="opacity-0 animate-fade-up"
+              style={{ animationDelay: "0.5s" }}
+            >
               <h1 className="text-2xl font-bold text-foreground">
                 {result.title}
               </h1>
               <p className="text-muted-foreground mt-1">{result.message}</p>
             </div>
 
-            <div className="py-6">
+            <div
+              className="py-6 opacity-0 animate-score-reveal"
+              style={{ animationDelay: "0.7s" }}
+            >
               <div className="text-5xl font-bold text-primary">
-                {submissionResult.correctAnswers}/
-                {submissionResult.totalQuestions}
+                <AnimatedNumber
+                  value={submissionResult.correctAnswers}
+                  delay={900}
+                  duration={800}
+                />
+                /{submissionResult.totalQuestions}
               </div>
               <p className="text-lg text-muted-foreground mt-2">
-                {percentage.toFixed(0)}% correct
+                <AnimatedNumber
+                  value={percentage}
+                  delay={1100}
+                  duration={800}
+                  suffix="%"
+                />{" "}
+                correct
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div
+              className="space-y-3 opacity-0 animate-fade-up"
+              style={{ animationDelay: "1s" }}
+            >
               {list.questions.map((question, index) => {
                 const answer = submissionResult.answers.find(
                   (a) => a.questionId === question.id
@@ -458,13 +491,14 @@ export default function StudentQuiz() {
                 return (
                   <div
                     key={question.id}
-                    className={`rounded-lg p-3 text-left text-sm ${
+                    className={`rounded-lg p-3 text-left text-sm opacity-0 animate-fade-up ${
                       isOpenEnded
                         ? "bg-success/10"
                         : isCorrect
                           ? "bg-success/10"
                           : "bg-destructive/10"
                     }`}
+                    style={{ animationDelay: `${1.2 + index * 0.1}s` }}
                   >
                     <div className="flex items-start gap-2">
                       {isOpenEnded ? (
@@ -509,13 +543,20 @@ export default function StudentQuiz() {
               })}
             </div>
 
-            <Button
-              onClick={() => router.push("/student/dashboard")}
-              className="w-full"
-              size="lg"
+            <div
+              className="opacity-0 animate-fade-up"
+              style={{
+                animationDelay: `${1.2 + list.questions.length * 0.1}s`,
+              }}
             >
-              Go to Dashboard
-            </Button>
+              <Button
+                onClick={() => router.push("/student/dashboard")}
+                className="w-full"
+                size="lg"
+              >
+                Go to Dashboard
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -573,7 +614,7 @@ export default function StudentQuiz() {
                 {currentQuestion.options.map((option) => (
                   <div
                     key={option.id}
-                    className={`flex items-center space-x-3 rounded-lg border-2 p-4 w-full min-w-0 transition-all cursor-pointer ${
+                    className={`flex items-center space-x-3 rounded-lg border-2 p-4 w-full min-w-0 transition-all cursor-pointer active:scale-[0.99] active:brightness-95 ${
                       answers[currentQuestion.id] === option.id
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"

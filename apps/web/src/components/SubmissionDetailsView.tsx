@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
 import { QuestionType } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
@@ -126,10 +127,15 @@ export function SubmissionDetailsView({
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">
-                    {submission.correctAnswers}/{submission.totalQuestions}
+                    <AnimatedNumber
+                      value={submission.correctAnswers}
+                      delay={200}
+                    />
+                    /{submission.totalQuestions}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {percentage.toFixed(0)}% correct
+                    <AnimatedNumber value={percentage} delay={300} suffix="%" />{" "}
+                    correct
                   </p>
                 </div>
               </div>

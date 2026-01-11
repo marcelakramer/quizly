@@ -66,23 +66,23 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
           </div>
           <div className="flex items-center gap-2">
             {list.submissions?.length === 0 && (
-              <Link href={`/teacher/exercise-lists/${list.id}/edit`}>
-                <Button variant="outline" size="sm">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/teacher/exercise-lists/${list.id}/edit`}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
             <Button variant="outline" size="sm" onClick={handleShare}>
               <Share2 className="mr-2 h-4 w-4" />
               Share
             </Button>
-            <Link href={`/teacher/results/${list.id}`}>
-              <Button variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/teacher/results/${list.id}`}>
                 <Users className="mr-2 h-4 w-4" />
                 Results
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </CardContent>

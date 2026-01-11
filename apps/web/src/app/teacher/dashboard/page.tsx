@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { ExerciseListCard } from "@/components/ExerciseListCard";
 import { ExerciseListCardSkeletons } from "@/components/ExerciseListCardSkeletons";
 import { EmptyState } from "@/components/EmptyState";
+import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";
 
@@ -49,14 +50,16 @@ export default function TeacherDashboard() {
               Create and manage quizzes for your students
             </p>
           </div>
-          <Link
-            href="/teacher/exercise-lists/create"
-            className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium shadow-md hover:shadow-lg transition-all opacity-0 animate-fade-up"
+          <Button
+            asChild
+            className="opacity-0 animate-fade-up"
             style={{ animationDelay: "0.1s" }}
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Create New List
-          </Link>
+            <Link href="/teacher/exercise-lists/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Create New List
+            </Link>
+          </Button>
         </div>
 
         {loading ? (

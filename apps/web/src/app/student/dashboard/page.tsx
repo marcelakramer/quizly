@@ -33,6 +33,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { StudentDashboardSkeleton } from "@/components/StudentDashboardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
 
 import { StudentSubmission } from "@/types";
 
@@ -237,7 +238,11 @@ export default function StudentDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-lg font-bold text-foreground">
-                          {averageScore.toFixed(0)}%
+                          <AnimatedNumber
+                            value={averageScore}
+                            suffix="%"
+                            delay={200}
+                          />
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Average Score
@@ -251,7 +256,11 @@ export default function StudentDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-lg font-bold text-foreground">
-                          {bestScore.toFixed(0)}%
+                          <AnimatedNumber
+                            value={bestScore}
+                            suffix="%"
+                            delay={300}
+                          />
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Best Score
@@ -265,7 +274,7 @@ export default function StudentDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-lg font-bold text-foreground">
-                          {totalQuizzes}
+                          <AnimatedNumber value={totalQuizzes} delay={400} />
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {totalQuizzes === 1 ? "Quiz" : "Quizzes"}
@@ -279,7 +288,8 @@ export default function StudentDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-lg font-bold text-foreground">
-                          {totalCorrect}/{totalQuestions}
+                          <AnimatedNumber value={totalCorrect} delay={500} />/
+                          {totalQuestions}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Total Correct
@@ -329,7 +339,7 @@ export default function StudentDashboard() {
                       <Link
                         key={submission.id}
                         href={`/results/${submission.id}`}
-                        className="block rounded-lg border border-border/50 p-4 hover:border-primary/50 hover:bg-primary/5 transition-all opacity-0 animate-fade-up"
+                        className="block rounded-lg border border-border/50 p-4 hover:border-primary/50 hover:bg-primary/5 transition-all opacity-0 animate-fade-up active:scale-[0.99] active:brightness-95"
                         style={{ animationDelay: `${0.4 + index * 0.05}s` }}
                       >
                         <div className="flex items-start justify-between">

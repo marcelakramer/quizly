@@ -24,7 +24,7 @@ export function RoleCard({
       <RadioGroupItem value={value} id={id} className="peer sr-only" />
       <Label
         htmlFor={id}
-        className={`flex flex-col items-center justify-center rounded-md border-2 p-4 cursor-pointer transition-all h-[100px] w-full ${
+        className={`flex flex-col items-center justify-center rounded-md border-2 p-4 cursor-pointer transition-all h-[100px] w-full active:scale-[0.98] active:brightness-95 ${
           selected
             ? "border-primary bg-primary/5"
             : "border-muted bg-background hover:bg-accent hover:text-white"

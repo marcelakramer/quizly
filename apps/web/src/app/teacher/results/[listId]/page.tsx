@@ -10,6 +10,7 @@ import { formatDate, formatTime } from "@/lib/utils/date";
 import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { ResultsSkeleton } from "@/components/ResultsSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { ArrowLeft, Users, Trophy, Share2 } from "lucide-react";
@@ -151,7 +152,7 @@ export default function ViewResults() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">
-                    {submissions.length}
+                    <AnimatedNumber value={submissions.length} delay={200} />
                   </p>
                   <p className="text-sm text-muted-foreground">Submissions</p>
                 </div>
@@ -167,7 +168,11 @@ export default function ViewResults() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">
-                    {averageScore.toFixed(0)}%
+                    <AnimatedNumber
+                      value={averageScore}
+                      delay={300}
+                      suffix="%"
+                    />
                   </p>
                   <p className="text-sm text-muted-foreground">Avg. Score</p>
                 </div>
@@ -180,12 +185,12 @@ export default function ViewResults() {
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
                   <span className="text-lg font-bold text-accent">
-                    {list.questions.length}
+                    <AnimatedNumber value={list.questions.length} delay={400} />
                   </span>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">
-                    {list.questions.length}
+                    <AnimatedNumber value={list.questions.length} delay={400} />
                   </p>
                   <p className="text-sm text-muted-foreground">Questions</p>
                 </div>
@@ -216,7 +221,7 @@ export default function ViewResults() {
                     <Link
                       key={submission.id}
                       href={`/results/${submission.id}`}
-                      className="flex items-center justify-between rounded-lg border border-border/50 p-4 opacity-0 animate-fade-up hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer"
+                      className="flex items-center justify-between rounded-lg border border-border/50 p-4 opacity-0 animate-fade-up hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer active:scale-[0.99] active:brightness-95"
                       style={{ animationDelay: `${0.4 + index * 0.1}s` }}
                     >
                       <div className="flex items-center gap-3">
