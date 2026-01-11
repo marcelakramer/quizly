@@ -5,11 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { SubmissionDetailsSkeleton } from "@/components/SubmissionDetailsSkeleton";
 import { SubmissionDetailsView } from "@/components/SubmissionDetailsView";
-import { User, ShieldX, FileQuestion, ArrowLeft } from "lucide-react";
+import { ErrorStateCard } from "@/components/ErrorStateCard";
+import { User, ShieldX, FileQuestion } from "lucide-react";
 import { UserRole } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
 
@@ -110,72 +109,29 @@ export default function SubmissionDetails() {
       },
     }[error.type];
 
-    const Icon = errorConfig.icon;
-
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="glass-card max-w-md w-full opacity-0 animate-scale-in">
-          <CardContent className="pt-8 pb-8">
-            <div className="text-center space-y-6">
-              <div className="flex justify-center">
-                <div
-                  className={`flex h-20 w-20 items-center justify-center rounded-full ${errorConfig.iconBg}`}
-                >
-                  <Icon className={`h-10 w-10 ${errorConfig.iconColor}`} />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold text-foreground">
-                  {errorConfig.title}
-                </h1>
-                <p className="text-muted-foreground">{error.message}</p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => router.push(dashboardUrl)}
-                className="mt-4"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <ErrorStateCard
+        icon={errorConfig.icon}
+        title={errorConfig.title}
+        message={error.message}
+        iconBg={errorConfig.iconBg}
+        iconColor={errorConfig.iconColor}
+        onBack={() => router.push(dashboardUrl)}
+        backLabel="Back to Dashboard"
+      />
     );
   }
 
   if (!submission) {
     return (
-      <div className="flex-1 bg-background flex items-center justify-center p-4">
-        <Card className="glass-card max-w-md w-full opacity-0 animate-scale-in">
-          <CardContent className="pt-8 pb-8">
-            <div className="text-center space-y-6">
-              <div className="flex justify-center">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted/50">
-                  <FileQuestion className="h-10 w-10 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold text-foreground">
-                  Submission Not Found
-                </h1>
-                <p className="text-muted-foreground">
-                  This submission could not be found.
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => router.push(dashboardUrl)}
-                className="mt-4"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <ErrorStateCard
+        icon={FileQuestion}
+        title="Submission Not Found"
+        message="This submission could not be found."
+        onBack={() => router.push(dashboardUrl)}
+        backLabel="Back to Dashboard"
+        fullScreen={false}
+      />
     );
   }
 

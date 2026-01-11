@@ -5,9 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 interface StatCardProps {
   icon: LucideIcon | ReactNode;
   value: ReactNode;
-  label: string;
+  label: ReactNode;
   colorClass?: string;
   variant?: "simple" | "card";
+  valueSize?: "sm" | "md" | "lg";
 }
 
 export function StatCard({
@@ -16,9 +17,17 @@ export function StatCard({
   label,
   colorClass = "primary",
   variant = "simple",
+  valueSize,
 }: StatCardProps) {
   const isRenderedElement = isValidElement(icon);
   const IconComponent = icon as LucideIcon;
+
+  const getValueSizeClass = () => {
+    if (valueSize === "sm") return "text-base";
+    if (valueSize === "md") return "text-lg";
+    if (valueSize === "lg") return "text-2xl";
+    return variant === "card" ? "text-2xl" : "text-lg";
+  };
 
   const content = (
     <div className="flex items-center gap-3">
@@ -33,11 +42,13 @@ export function StatCard({
       </div>
       <div className="flex-1 min-w-0">
         <p
-          className={`${variant === "card" ? "text-2xl" : "text-lg"} font-bold text-foreground`}
+          className={`${getValueSizeClass()} font-bold text-foreground leading-none`}
         >
           {value}
         </p>
-        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground leading-none mt-1">
+          {label}
+        </p>
       </div>
     </div>
   );
@@ -45,10 +56,10 @@ export function StatCard({
   if (variant === "card") {
     return (
       <Card className="glass-card">
-        <CardContent className="pt-6">{content}</CardContent>
+        <CardContent className="pt-6 pb-6">{content}</CardContent>
       </Card>
     );
   }
 
-  return <div className="glass-card rounded-lg p-3">{content}</div>;
+  return <div className="glass-card rounded-lg p-4">{content}</div>;
 }
