@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -80,7 +80,7 @@
     --border: 200 20% 22%;
     --input: 200 20% 22%;
     --ring: 168 65% 45%;
-    
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -97,7 +97,8 @@
     @apply border-border;
   }
 
-  html, body {
+  html,
+  body {
     @apply h-full overflow-x-hidden;
   }
 
@@ -105,7 +106,12 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
 }
@@ -135,10 +141,18 @@
     animation: scaleIn 0.3s ease-out forwards;
   }
 
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
-  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-1 {
+    animation-delay: 0.1s;
+  }
+  .stagger-2 {
+    animation-delay: 0.2s;
+  }
+  .stagger-3 {
+    animation-delay: 0.3s;
+  }
+  .stagger-4 {
+    animation-delay: 0.4s;
+  }
 }
 
 @keyframes fadeUp {
@@ -195,7 +209,8 @@
 }
 
 .animate-celebrate-bounce {
-  animation: celebrateBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+  animation: celebrateBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+    forwards;
 }
 
 .animate-score-reveal {
@@ -245,7 +260,8 @@
 }
 
 @keyframes logoPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }

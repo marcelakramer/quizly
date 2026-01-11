@@ -1,8 +1,5 @@
 module.exports = {
-  extends: [
-    "plugin:@typescript-eslint/recommended",
-    "prettier",
-  ],
+  extends: ["plugin:@typescript-eslint/recommended", "prettier"],
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint"],
   rules: {
@@ -17,5 +14,13 @@ module.exports = {
     "prefer-const": "error",
     "no-var": "error",
   },
-  ignorePatterns: ["node_modules/", ".next/", "dist/", "build/", "*.config.js", "*.config.cjs", ".eslintrc.*"],
+  ignorePatterns: [
+    "node_modules/",
+    ".next/",
+    "dist/",
+    "build/",
+    "*.config.js",
+    "*.config.cjs",
+    ".eslintrc.*",
+  ],
 };
