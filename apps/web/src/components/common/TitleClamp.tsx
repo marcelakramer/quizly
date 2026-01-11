@@ -16,7 +16,6 @@ export function TitleClamp({ title, lines = 3 }: TitleClampProps) {
     const el = ref.current;
     if (!el) return;
 
-    // allow layout to settle
     requestAnimationFrame(() => {
       const isOverflowing = el.scrollHeight > el.clientHeight + 1;
       setShowToggle(isOverflowing);

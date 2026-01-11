@@ -17,7 +17,6 @@ interface QuestionPreviewProps {
   isNew?: boolean;
 }
 
-// Memoized content that doesn't depend on index
 const QuestionContent = memo(function QuestionContent({
   question,
   onRemove,

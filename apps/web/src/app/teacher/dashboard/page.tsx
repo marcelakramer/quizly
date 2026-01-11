@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/contexts/auth-context";
-import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { useExerciseLists } from "@/hooks/use-exercise-lists";
 import {
   ExerciseListCard,
   ExerciseListCardSkeletons,
@@ -13,35 +10,9 @@ import { EmptyState } from "@/components/common";
 import { PageHeader, PageContainer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList } from "lucide-react";
-import { ExerciseListWithRelations } from "@/types";
 
 export default function TeacherDashboard() {
-  const { firebaseUser } = useAuth();
-  const [exerciseLists, setExerciseLists] = useState<
-    ExerciseListWithRelations[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchExerciseLists = async () => {
-      if (!firebaseUser) return;
-
-      try {
-        const auth = getAuthInstance();
-        const idToken = await auth.currentUser?.getIdToken();
-        if (idToken) {
-          const { lists } = await api.exercises.lists.getAll(idToken);
-          setExerciseLists(lists);
-        }
-      } catch (error) {
-        console.error("Error fetching exercise lists:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchExerciseLists();
-  }, [firebaseUser]);
+  const { exerciseLists, loading } = useExerciseLists();
 
   return (
     <PageContainer>

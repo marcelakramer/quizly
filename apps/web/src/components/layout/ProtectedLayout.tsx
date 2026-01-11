@@ -53,7 +53,6 @@ export function ProtectedLayout({
     }
   }, [dbUser, status, allowedRole, router]);
 
-  // Show splash during any transition state
   if (status === "idle" || status === "loading" || status === "signing-out") {
     return <SplashScreen />;
   }

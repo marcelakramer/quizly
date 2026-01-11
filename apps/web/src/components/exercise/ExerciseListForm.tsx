@@ -123,7 +123,6 @@ export function ExerciseListForm({
     };
     setQuestions([...questions, questionWithOrder]);
     setNewQuestionIds((prev) => new Set(prev).add(question.id));
-    // Remove from newQuestionIds after animation completes
     setTimeout(() => {
       setNewQuestionIds((prev) => {
         const next = new Set(prev);

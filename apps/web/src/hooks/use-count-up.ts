@@ -33,7 +33,6 @@ export function useCountUp({
           1
         );
 
-        // Easing function (ease-out cubic)
         const easeOut = 1 - Math.pow(1 - progress, 3);
         const currentValue = easeOut * end;
 

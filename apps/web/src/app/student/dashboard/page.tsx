@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils/date";
 import { getScoreColorClass } from "@/lib/utils/exercise";
@@ -23,100 +21,31 @@ import {
   CheckCircle,
   ClipboardList,
 } from "lucide-react";
-import { toast } from "sonner";
-import { api } from "@/lib/api";
-import { useAuth } from "@/contexts/auth-context";
-import { getAuthInstance } from "@teachy/firebase";
 import { StudentDashboardSkeleton } from "@/components/dashboard";
 import { EmptyState, AnimatedNumber } from "@/components/common";
-
-import { StudentSubmission } from "@/types";
+import { useStudentSubmissions } from "@/hooks/use-student-submissions";
+import { useShareCodeNavigation } from "@/hooks/use-share-code-navigation";
 
 export default function StudentDashboard() {
-  const router = useRouter();
-  const { firebaseUser, status } = useAuth();
-  const [shareCode, setShareCode] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
-  const [loadingSubmissions, setLoadingSubmissions] = useState(true);
+  const { submissions, loading, stats } = useStudentSubmissions();
+  const {
+    shareCode,
+    loading: codeLoading,
+    handleSubmit,
+    updateShareCode,
+  } = useShareCodeNavigation();
 
-  const authLoading = status === "idle" || status === "loading";
-
-  useEffect(() => {
-    const fetchSubmissions = async () => {
-      if (!firebaseUser || authLoading) return;
-
-      try {
-        const auth = getAuthInstance();
-        const idToken = await auth.currentUser?.getIdToken();
-
-        if (!idToken) {
-          return;
-        }
-
-        const { submissions: fetchedSubmissions } =
-          await api.exercises.student.getAll(idToken);
-        setSubmissions(fetchedSubmissions);
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
-      } finally {
-        setLoadingSubmissions(false);
-      }
-    };
-
-    fetchSubmissions();
-  }, [firebaseUser, authLoading]);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!shareCode.trim()) {
-      toast.error("Please enter a quiz code.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await api.quiz.getByShareCode(shareCode.trim().toUpperCase());
-      router.push(`/quiz/${shareCode.trim().toUpperCase()}`);
-    } catch (error) {
-      console.error("Error validating quiz code:", error);
-      setShareCode("");
-      toast.error(
-        error instanceof Error
-          ? error.message.endsWith(".")
-            ? error.message
-            : `${error.message}.`
-          : "Invalid quiz code. Please check and try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (authLoading || loadingSubmissions) {
+  if (loading) {
     return <StudentDashboardSkeleton />;
   }
 
-  const totalQuizzes = submissions.length;
-  const averageScore =
-    submissions.length > 0
-      ? submissions.reduce((acc, sub) => acc + sub.score, 0) /
-        submissions.length
-      : 0;
-  const totalQuestions = submissions.reduce(
-    (acc, sub) => acc + sub.totalQuestions,
-    0
-  );
-  const totalCorrect = submissions.reduce(
-    (acc, sub) => acc + sub.correctAnswers,
-    0
-  );
-  const bestScore =
-    submissions.length > 0
-      ? Math.max(...submissions.map((sub) => sub.score))
-      : 0;
+  const {
+    totalQuizzes,
+    averageScore,
+    totalQuestions,
+    totalCorrect,
+    bestScore,
+  } = stats;
 
   return (
     <PageContainer>
@@ -150,10 +79,10 @@ export default function StudentDashboard() {
                     type="text"
                     placeholder="Enter quiz code (e.g., ABC123)"
                     value={shareCode}
-                    onChange={(e) => setShareCode(e.target.value.toUpperCase())}
+                    onChange={(e) => updateShareCode(e.target.value)}
                     className="font-mono tracking-widest"
                     maxLength={6}
-                    disabled={loading}
+                    disabled={codeLoading}
                     autoFocus
                     showError={false}
                   />
@@ -167,9 +96,9 @@ export default function StudentDashboard() {
                     type="submit"
                     className="w-full"
                     size="lg"
-                    disabled={loading || !shareCode.trim()}
+                    disabled={codeLoading || !shareCode.trim()}
                   >
-                    {loading ? (
+                    {codeLoading ? (
                       "Validating..."
                     ) : (
                       <>
