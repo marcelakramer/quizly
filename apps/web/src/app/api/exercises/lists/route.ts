@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth } from "@teachy/firebase/admin";
 import { prisma, QuestionType } from "@teachy/db";
 import { z } from "zod";
 import { generateShareCode } from "@/lib/utils/exercise";
+import { requireTeacher, handleApiError } from "@/lib/api/server";
 
 const createListSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  description: z.string().nullable(),
+  description: z.string().nullable().optional(),
   questions: z.array(
     z.object({
       title: z.string().min(1, "Question title is required"),
@@ -26,38 +26,7 @@ const createListSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.substring(7);
-
-    const adminAuth = getAdminAuth();
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const { email } = decodedToken;
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email not found in token" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role !== "TEACHER") {
-      return NextResponse.json(
-        { error: "Forbidden: Only teachers can access this resource" },
-        { status: 403 }
-      );
-    }
+    const { user } = await requireTeacher(request);
 
     const lists = await prisma.exerciseList.findMany({
       where: { teacherId: user.id },
@@ -72,54 +41,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ lists });
   } catch (error) {
-    if (error instanceof Error && error.message.includes("token")) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    console.error("Error fetching exercise lists:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.substring(7);
-
-    const adminAuth = getAdminAuth();
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const { email } = decodedToken;
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email not found in token" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role !== "TEACHER") {
-      return NextResponse.json(
-        { error: "Forbidden: Only teachers can create exercise lists" },
-        { status: 403 }
-      );
-    }
+    const { user } = await requireTeacher(request);
 
     const body = await request.json();
     const validatedData = createListSchema.parse(body);
@@ -174,23 +102,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ list: exerciseList });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: error.errors[0].message },
-        { status: 400 }
-      );
-    }
-
-    if (error instanceof Error && error.message.includes("token")) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    console.error("Error creating exercise list:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

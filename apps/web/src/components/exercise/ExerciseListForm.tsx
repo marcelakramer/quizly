@@ -28,7 +28,7 @@ import { EmptyState } from "@/components/common";
 import { ExerciseListFormSkeleton } from "./ExerciseListFormSkeleton";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { toast } from "sonner";
 import {
   Dialog,

@@ -9,7 +9,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { User, UserRole } from "@teachy/db";
 
 /**

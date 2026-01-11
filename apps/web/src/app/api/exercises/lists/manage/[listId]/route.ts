@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth } from "@teachy/firebase/admin";
 import { prisma, QuestionType } from "@teachy/db";
 import { z } from "zod";
+import { requireTeacher } from "@/lib/api/auth";
+import {
+  handleApiError,
+  notFound,
+  forbidden,
+  badRequest,
+} from "@/lib/api/server/errors";
 
 const updateListSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -28,39 +34,7 @@ export async function GET(
   { params }: { params: { listId: string } }
 ) {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.substring(7);
-
-    const adminAuth = getAdminAuth();
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const { email } = decodedToken;
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email not found in token" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role !== "TEACHER") {
-      return NextResponse.json(
-        { error: "Forbidden: Only teachers can access this resource" },
-        { status: 403 }
-      );
-    }
-
+    const { user } = await requireTeacher(request);
     const { listId } = params;
 
     const exerciseList = await prisma.exerciseList.findUnique({
@@ -79,32 +53,16 @@ export async function GET(
     });
 
     if (!exerciseList) {
-      return NextResponse.json(
-        { error: "Exercise list not found" },
-        { status: 404 }
-      );
+      throw notFound("Exercise list not found");
     }
 
     if (exerciseList.teacherId !== user.id) {
-      return NextResponse.json(
-        { error: "Forbidden: You can only access your own exercise lists" },
-        { status: 403 }
-      );
+      throw forbidden("You can only access your own exercise lists");
     }
 
     return NextResponse.json({ list: exerciseList });
   } catch (error) {
-    if (error instanceof Error && error.message.includes("token")) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    console.error("Error fetching exercise list:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -113,39 +71,7 @@ export async function PUT(
   { params }: { params: { listId: string } }
 ) {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.substring(7);
-
-    const adminAuth = getAdminAuth();
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const { email } = decodedToken;
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email not found in token" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role !== "TEACHER") {
-      return NextResponse.json(
-        { error: "Forbidden: Only teachers can update exercise lists" },
-        { status: 403 }
-      );
-    }
-
+    const { user } = await requireTeacher(request);
     const { listId } = params;
 
     const exerciseList = await prisma.exerciseList.findUnique({
@@ -156,32 +82,20 @@ export async function PUT(
     });
 
     if (!exerciseList) {
-      return NextResponse.json(
-        { error: "Exercise list not found" },
-        { status: 404 }
-      );
+      throw notFound("Exercise list not found");
     }
 
     if (exerciseList.teacherId !== user.id) {
-      return NextResponse.json(
-        { error: "Forbidden: You can only update your own exercise lists" },
-        { status: 403 }
-      );
+      throw forbidden("You can only update your own exercise lists");
     }
 
     if (exerciseList.submissions.length > 0) {
-      return NextResponse.json(
-        {
-          error: "Cannot edit exercise list that has submissions",
-        },
-        { status: 400 }
-      );
+      throw badRequest("Cannot edit exercise list that has submissions");
     }
 
     const body = await request.json();
     const validatedData = updateListSchema.parse(body);
 
-    // Delete all existing questions and options
     await prisma.option.deleteMany({
       where: {
         question: {
@@ -196,7 +110,6 @@ export async function PUT(
       },
     });
 
-    // Update the exercise list and create new questions
     const updatedList = await prisma.exerciseList.update({
       where: { id: listId },
       data: {
@@ -233,24 +146,7 @@ export async function PUT(
 
     return NextResponse.json({ list: updatedList });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: error.errors[0].message },
-        { status: 400 }
-      );
-    }
-
-    if (error instanceof Error && error.message.includes("token")) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    console.error("Error updating exercise list:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -259,79 +155,27 @@ export async function DELETE(
   { params }: { params: { listId: string } }
 ) {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const idToken = authHeader.substring(7);
-
-    const adminAuth = getAdminAuth();
-    const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const { email } = decodedToken;
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "Email not found in token" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role !== "TEACHER") {
-      return NextResponse.json(
-        { error: "Forbidden: Only teachers can delete exercise lists" },
-        { status: 403 }
-      );
-    }
-
+    const { user } = await requireTeacher(request);
     const { listId } = params;
 
     const exerciseList = await prisma.exerciseList.findUnique({
       where: { id: listId },
-      include: {
-        submissions: true,
-      },
     });
 
     if (!exerciseList) {
-      return NextResponse.json(
-        { error: "Exercise list not found" },
-        { status: 404 }
-      );
+      throw notFound("Exercise list not found");
     }
 
     if (exerciseList.teacherId !== user.id) {
-      return NextResponse.json(
-        { error: "Forbidden: You can only delete your own exercise lists" },
-        { status: 403 }
-      );
+      throw forbidden("You can only delete your own exercise lists");
     }
 
-    // Delete the exercise list (cascade will delete questions, options, answers, and submissions)
     await prisma.exerciseList.delete({
       where: { id: listId },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    if (error instanceof Error && error.message.includes("token")) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    console.error("Error deleting exercise list:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

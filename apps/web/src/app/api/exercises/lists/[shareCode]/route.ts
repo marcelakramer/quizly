@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@teachy/db";
+import { notFound, handleApiError } from "@/lib/api/server/errors";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { shareCode: string } }
 ) {
   try {
@@ -12,38 +13,21 @@ export async function GET(
       where: { shareCode },
       include: {
         teacher: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          select: { id: true, name: true, email: true },
         },
         questions: {
-          include: {
-            options: true,
-          },
-          orderBy: {
-            order: "asc",
-          },
+          include: { options: true },
+          orderBy: { order: "asc" },
         },
       },
     });
 
     if (!exerciseList) {
-      return NextResponse.json(
-        { error: "Exercise list not found" },
-        { status: 404 }
-      );
+      throw notFound("Exercise list not found");
     }
 
     return NextResponse.json({ list: exerciseList });
   } catch (error) {
-    console.error("Error fetching exercise list:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

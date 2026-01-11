@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { SubmissionDetailsSkeleton } from "@/components/submission";
 import { toast } from "sonner";
 

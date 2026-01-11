@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { toast } from "sonner";
 import { Submission, ExerciseListSummary } from "@/types";
 

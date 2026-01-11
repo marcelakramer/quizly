@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { ExerciseListWithRelations } from "@/types";
 
 export function useExerciseLists() {

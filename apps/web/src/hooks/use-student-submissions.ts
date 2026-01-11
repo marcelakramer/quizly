@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { StudentSubmission } from "@/types";
 
 interface SubmissionStats {
