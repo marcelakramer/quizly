@@ -7,13 +7,10 @@ import { formatDate } from "@/lib/utils/date";
 import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/PageHeader";
+import { IconCardHeader } from "@/components/IconCardHeader";
+import { StatCard } from "@/components/StatCard";
 import {
   Hash,
   ArrowRight,
@@ -126,12 +123,10 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-full bg-background">
       <main className="container py-8">
-        <div className="mb-8 opacity-0 animate-fade-up">
-          <h1 className="text-3xl font-bold text-foreground">My Activities</h1>
-          <p className="mt-2 text-muted-foreground">
-            Enter a quiz code or view your previous results
-          </p>
-        </div>
+        <PageHeader
+          title="My Activities"
+          description="Enter a quiz code or view your previous results"
+        />
 
         <div className="grid gap-6 lg:grid-cols-2 mb-8">
           <div
@@ -139,19 +134,11 @@ export default function StudentDashboard() {
             style={{ animationDelay: "0.1s" }}
           >
             <Card className="glass-card h-full flex flex-col">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <Hash className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">Enter Quiz Code</CardTitle>
-                    <CardDescription>
-                      Get the code from your teacher to start the quiz
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
+              <IconCardHeader
+                icon={Hash}
+                title="Enter Quiz Code"
+                description="Get the code from your teacher to start the quiz"
+              />
               <CardContent className="flex-1 flex flex-col">
                 <form
                   onSubmit={handleSubmit}
@@ -207,21 +194,11 @@ export default function StudentDashboard() {
             style={{ animationDelay: "0.2s" }}
           >
             <Card className="glass-card h-full flex flex-col">
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">
-                      Performance Overview
-                    </CardTitle>
-                    <CardDescription>
-                      Your overall quiz statistics
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
+              <IconCardHeader
+                icon={TrendingUp}
+                title="Performance Overview"
+                description="Your overall quiz statistics"
+              />
               <CardContent>
                 {submissions.length === 0 ? (
                   <EmptyState
@@ -232,70 +209,49 @@ export default function StudentDashboard() {
                   />
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="glass-card rounded-lg p-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                        <Trophy className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-lg font-bold text-foreground">
-                          <AnimatedNumber
-                            value={averageScore}
-                            suffix="%"
-                            delay={200}
-                          />
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Average Score
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="glass-card rounded-lg p-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 flex-shrink-0">
-                        <Award className="h-5 w-5 text-success" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-lg font-bold text-foreground">
-                          <AnimatedNumber
-                            value={bestScore}
-                            suffix="%"
-                            delay={300}
-                          />
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Best Score
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="glass-card rounded-lg p-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 flex-shrink-0">
-                        <FileText className="h-5 w-5 text-accent" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-lg font-bold text-foreground">
-                          <AnimatedNumber value={totalQuizzes} delay={400} />
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {totalQuizzes === 1 ? "Quiz" : "Quizzes"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="glass-card rounded-lg p-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                        <CheckCircle className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-lg font-bold text-foreground">
+                    <StatCard
+                      icon={Trophy}
+                      value={
+                        <AnimatedNumber
+                          value={averageScore}
+                          suffix="%"
+                          delay={200}
+                        />
+                      }
+                      label="Average Score"
+                      colorClass="primary"
+                    />
+                    <StatCard
+                      icon={Award}
+                      value={
+                        <AnimatedNumber
+                          value={bestScore}
+                          suffix="%"
+                          delay={300}
+                        />
+                      }
+                      label="Best Score"
+                      colorClass="success"
+                    />
+                    <StatCard
+                      icon={FileText}
+                      value={
+                        <AnimatedNumber value={totalQuizzes} delay={400} />
+                      }
+                      label={totalQuizzes === 1 ? "Quiz" : "Quizzes"}
+                      colorClass="accent"
+                    />
+                    <StatCard
+                      icon={CheckCircle}
+                      value={
+                        <>
                           <AnimatedNumber value={totalCorrect} delay={500} />/
                           {totalQuestions}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Total Correct
-                        </p>
-                      </div>
-                    </div>
+                        </>
+                      }
+                      label="Total Correct"
+                      colorClass="primary"
+                    />
                   </div>
                 )}
               </CardContent>
@@ -308,19 +264,11 @@ export default function StudentDashboard() {
           style={{ animationDelay: "0.3s" }}
         >
           <Card className="glass-card">
-            <CardHeader>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <ClipboardList className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl">My Results</CardTitle>
-                  <CardDescription>
-                    View your previous quiz submissions
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
+            <IconCardHeader
+              icon={ClipboardList}
+              title="My Results"
+              description="View your previous quiz submissions"
+            />
             <CardContent>
               {submissions.length === 0 ? (
                 <EmptyState

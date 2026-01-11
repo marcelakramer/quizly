@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { ExerciseListCard } from "@/components/ExerciseListCard";
 import { ExerciseListCardSkeletons } from "@/components/ExerciseListCardSkeletons";
 import { EmptyState } from "@/components/EmptyState";
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";
@@ -43,24 +44,18 @@ export default function TeacherDashboard() {
   return (
     <div className="min-h-full bg-background">
       <main className="container py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div className="opacity-0 animate-fade-up">
-            <h1 className="text-3xl font-bold">My Exercise Lists</h1>
-            <p className="mt-1 text-muted-foreground">
-              Create and manage quizzes for your students
-            </p>
-          </div>
-          <Button
-            asChild
-            className="opacity-0 animate-fade-up"
-            style={{ animationDelay: "0.1s" }}
-          >
-            <Link href="/teacher/exercise-lists/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New List
-            </Link>
-          </Button>
-        </div>
+        <PageHeader
+          title="My Exercise Lists"
+          description="Create and manage quizzes for your students"
+          actions={
+            <Button asChild>
+              <Link href="/teacher/exercise-lists/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Create New List
+              </Link>
+            </Button>
+          }
+        />
 
         {loading ? (
           <ExerciseListCardSkeletons count={3} />
