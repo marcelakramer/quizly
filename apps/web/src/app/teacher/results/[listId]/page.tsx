@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
-import { formatDate, formatTime } from "@/lib/utils/date";
-import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { ResultsSkeleton } from "@/components/ResultsSkeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { PageContainer } from "@/components/PageContainer";
+import { PageHeader } from "@/components/PageHeader";
+import { StatCard } from "@/components/StatCard";
+import { SubmissionListItem } from "@/components/SubmissionListItem";
 import { ArrowLeft, Users, Trophy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -70,22 +71,18 @@ export default function ViewResults() {
 
   if (!list) {
     return (
-      <div className="min-h-full bg-background">
-        <main className="container py-8">
-          <div className="text-center py-16">
-            <h1 className="text-2xl font-bold text-foreground">
-              List not found
-            </h1>
-            <Button
-              variant="tertiary"
-              onClick={() => router.push("/teacher/dashboard")}
-              className="mt-4"
-            >
-              Back to Dashboard
-            </Button>
-          </div>
-        </main>
-      </div>
+      <PageContainer>
+        <div className="text-center py-16">
+          <h1 className="text-2xl font-bold text-foreground">List not found</h1>
+          <Button
+            variant="tertiary"
+            onClick={() => router.push("/teacher/dashboard")}
+            className="mt-4"
+          >
+            Back to Dashboard
+          </Button>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -109,153 +106,91 @@ export default function ViewResults() {
       : 0;
 
   return (
-    <div className="min-h-full bg-background">
-      <main className="container py-8">
-        <Button
-          variant="tertiary"
-          onClick={() => router.push("/teacher/dashboard")}
-          className="mb-6 opacity-0 animate-fade-up"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Button>
+    <PageContainer>
+      <Button
+        variant="tertiary"
+        onClick={() => router.push("/teacher/dashboard")}
+        className="mb-6 opacity-0 animate-fade-up"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Dashboard
+      </Button>
 
-        <div
-          className="mb-8 flex items-start justify-between opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.1s" }}
-        >
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{list.title}</h1>
-            {list.description && (
-              <p className="mt-1 text-muted-foreground">{list.description}</p>
-            )}
-          </div>
+      <PageHeader
+        title={list.title}
+        description={list.description}
+        align="start"
+        animationDelay="0.1s"
+        actions={
           <Button
             variant="outline"
             onClick={handleShare}
-            className="shrink-0 whitespace-nowrap"
+            className="whitespace-nowrap"
           >
             <Share2 className="mr-2 h-4 w-4" />
             Share Link
           </Button>
-        </div>
+        }
+      />
 
-        <div
-          className="grid gap-4 md:grid-cols-3 mb-8 opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <Card className="glass-card">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    <AnimatedNumber value={submissions.length} delay={200} />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Submissions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div
+        className="grid gap-4 md:grid-cols-3 mb-8 opacity-0 animate-fade-up"
+        style={{ animationDelay: "0.2s" }}
+      >
+        <StatCard
+          icon={Users}
+          value={<AnimatedNumber value={submissions.length} delay={200} />}
+          label="Submissions"
+          colorClass="primary"
+          variant="card"
+        />
+        <StatCard
+          icon={Trophy}
+          value={<AnimatedNumber value={averageScore} delay={300} suffix="%" />}
+          label="Avg. Score"
+          colorClass="success"
+          variant="card"
+        />
+        <StatCard
+          icon={
+            <span className="text-lg font-bold text-accent">
+              <AnimatedNumber value={list.questions.length} delay={400} />
+            </span>
+          }
+          value={<AnimatedNumber value={list.questions.length} delay={400} />}
+          label="Questions"
+          colorClass="accent"
+          variant="card"
+        />
+      </div>
 
-          <Card className="glass-card">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
-                  <Trophy className="h-5 w-5 text-success" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    <AnimatedNumber
-                      value={averageScore}
-                      delay={300}
-                      suffix="%"
-                    />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Avg. Score</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                  <span className="text-lg font-bold text-accent">
-                    <AnimatedNumber value={list.questions.length} delay={400} />
-                  </span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    <AnimatedNumber value={list.questions.length} delay={400} />
-                  </p>
-                  <p className="text-sm text-muted-foreground">Questions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card
-          className="glass-card opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.3s" }}
-        >
-          <CardHeader>
-            <CardTitle>Student Submissions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {submissions.length === 0 ? (
-              <EmptyState
-                icon={Users}
-                title="No submissions yet"
-                description="Share the quiz link with your students to start receiving responses"
-              />
-            ) : (
-              <div className="space-y-3">
-                {submissions.map((submission, index) => {
-                  const percentage = submission.percentage;
-                  return (
-                    <Link
-                      key={submission.id}
-                      href={`/results/${submission.id}`}
-                      className="flex items-center justify-between rounded-lg border border-border/50 p-4 opacity-0 animate-fade-up hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer active:scale-[0.99] active:brightness-95"
-                      style={{ animationDelay: `${0.4 + index * 0.1}s` }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                          {submission.studentName.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            {submission.studentName}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(submission.submittedAt)} at{" "}
-                            {formatTime(submission.submittedAt)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p
-                          className={`text-lg font-bold ${getScoreColorClass(percentage)}`}
-                        >
-                          {submission.score}/{submission.totalQuestions}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {percentage.toFixed(0)}%
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+      <Card
+        className="glass-card opacity-0 animate-fade-up"
+        style={{ animationDelay: "0.3s" }}
+      >
+        <CardHeader>
+          <CardTitle>Student Submissions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {submissions.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title="No submissions yet"
+              description="Share the quiz link with your students to start receiving responses"
+            />
+          ) : (
+            <div className="space-y-3">
+              {submissions.map((submission, index) => (
+                <SubmissionListItem
+                  key={submission.id}
+                  submission={submission}
+                  animationDelay={`${0.4 + index * 0.1}s`}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </PageContainer>
   );
 }

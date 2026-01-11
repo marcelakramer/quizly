@@ -9,6 +9,7 @@ import { ExerciseListCard } from "@/components/ExerciseListCard";
 import { ExerciseListCardSkeletons } from "@/components/ExerciseListCardSkeletons";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
+import { PageContainer } from "@/components/PageContainer";
 import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";
@@ -42,40 +43,38 @@ export default function TeacherDashboard() {
   }, [firebaseUser]);
 
   return (
-    <div className="min-h-full bg-background">
-      <main className="container py-8">
-        <PageHeader
-          title="My Exercise Lists"
-          description="Create and manage quizzes for your students"
-          actions={
-            <Button asChild>
-              <Link href="/teacher/exercise-lists/create">
-                <Plus className="mr-2 h-4 w-4" />
-                Create New List
-              </Link>
-            </Button>
-          }
-        />
+    <PageContainer>
+      <PageHeader
+        title="My Exercise Lists"
+        description="Create and manage quizzes for your students"
+        actions={
+          <Button asChild>
+            <Link href="/teacher/exercise-lists/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Create New List
+            </Link>
+          </Button>
+        }
+      />
 
-        {loading ? (
-          <ExerciseListCardSkeletons count={3} />
-        ) : exerciseLists.length === 0 ? (
-          <EmptyState
-            icon={ClipboardList}
-            title="No exercise lists yet"
-            description="Create your first exercise list to start assessing your students"
-            buttonText="Create Your First List"
-            buttonHref="/teacher/exercise-lists/create"
-            buttonIcon={Plus}
-          />
-        ) : (
-          <div className="grid gap-4">
-            {exerciseLists.map((list, index) => (
-              <ExerciseListCard key={list.id} list={list} index={index} />
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+      {loading ? (
+        <ExerciseListCardSkeletons count={3} />
+      ) : exerciseLists.length === 0 ? (
+        <EmptyState
+          icon={ClipboardList}
+          title="No exercise lists yet"
+          description="Create your first exercise list to start assessing your students"
+          buttonText="Create Your First List"
+          buttonHref="/teacher/exercise-lists/create"
+          buttonIcon={Plus}
+        />
+      ) : (
+        <div className="grid gap-4">
+          {exerciseLists.map((list, index) => (
+            <ExerciseListCard key={list.id} list={list} index={index} />
+          ))}
+        </div>
+      )}
+    </PageContainer>
   );
 }

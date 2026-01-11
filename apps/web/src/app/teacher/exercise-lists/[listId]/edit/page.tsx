@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { ExerciseListForm } from "@/components/ExerciseListForm";
 import { ExerciseListFormSkeleton } from "@/components/ExerciseListFormSkeleton";
+import { PageContainer } from "@/components/PageContainer";
 import { Question } from "@/types";
 
 export default function EditList() {
@@ -56,19 +57,15 @@ export default function EditList() {
 
   if (!firebaseUser) {
     return (
-      <div className="min-h-full bg-background">
-        <main className="container py-8">
-          <ExerciseListFormSkeleton showDeleteButton={true} />
-        </main>
-      </div>
+      <PageContainer>
+        <ExerciseListFormSkeleton showDeleteButton={true} />
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-full bg-background">
-      <main className="container py-8">
-        <ExerciseListForm mode="edit" listId={listId} onLoadData={loadData} />
-      </main>
-    </div>
+    <PageContainer>
+      <ExerciseListForm mode="edit" listId={listId} onLoadData={loadData} />
+    </PageContainer>
   );
 }

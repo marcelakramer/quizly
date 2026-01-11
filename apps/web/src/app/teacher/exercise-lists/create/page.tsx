@@ -1,13 +1,12 @@
 "use client";
 
 import { ExerciseListForm } from "@/components/ExerciseListForm";
+import { PageContainer } from "@/components/PageContainer";
 
 export default function CreateList() {
   return (
-    <div className="min-h-full bg-background">
-      <main className="container py-8">
-        <ExerciseListForm mode="create" />
-      </main>
-    </div>
+    <PageContainer>
+      <ExerciseListForm mode="create" />
+    </PageContainer>
   );
 }
