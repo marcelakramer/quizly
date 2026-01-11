@@ -35,9 +35,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Question } from "@/types";
 
@@ -316,25 +314,30 @@ export function ExerciseListForm({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  placeholder="e.g., Introduction to Fractions"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description (optional)</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe this exercise list..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                />
-              </div>
+              <FormField
+                label="Title"
+                id="title"
+                name="title"
+                placeholder="e.g., Introduction to Fractions"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onBlur={() => setTitle((s) => s.trim())}
+                maxLength={150}
+              />
+              <FormField
+                label="Description (optional)"
+                as="textarea"
+                id="description"
+                name="description"
+                placeholder="Describe this exercise list..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                onBlur={() => setDescription((s) => s.trim())}
+                maxLength={500}
+                rows={3}
+                autoGrow
+                showCounter={true}
+              />
             </CardContent>
           </Card>
 

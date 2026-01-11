@@ -54,11 +54,27 @@ export function SubmissionDetailsView({
           className="mb-8 opacity-0 animate-fade-up"
           style={{ animationDelay: "0.1s" }}
         >
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1
+            className="text-3xl font-bold text-foreground whitespace-pre-wrap break-words"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
             {submission.exerciseList.title}
           </h1>
           {submission.exerciseList.description && (
-            <p className="mt-1 text-muted-foreground">
+            <p
+              className="mt-1 text-muted-foreground whitespace-pre-wrap break-words"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
               {submission.exerciseList.description}
             </p>
           )}
@@ -188,7 +204,15 @@ export function SubmissionDetailsView({
                         <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
                       )}
                       <div className="flex-1">
-                        <p className="font-semibold text-foreground mb-2">
+                        <p
+                          className="font-semibold text-foreground mb-2 whitespace-pre-wrap break-words"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
                           Q{index + 1}: {answer.question.title}
                         </p>
                         <div className="space-y-2">
@@ -197,7 +221,15 @@ export function SubmissionDetailsView({
                               <p className="text-xs font-medium text-muted-foreground mb-1">
                                 {answerLabel}:
                               </p>
-                              <p className="text-sm text-success">
+                              <p
+                                className="text-sm text-success whitespace-pre-wrap break-words"
+                                style={{
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 6,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                }}
+                              >
                                 {answer.textAnswer || "No answer provided"}
                               </p>
                             </div>
@@ -212,7 +244,13 @@ export function SubmissionDetailsView({
                                     isCorrect
                                       ? "text-success"
                                       : "text-destructive"
-                                  }`}
+                                  } whitespace-pre-wrap break-words`}
+                                  style={{
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 4,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
+                                  }}
                                 >
                                   {answer.selectedOption?.label}
                                 </p>
@@ -222,7 +260,15 @@ export function SubmissionDetailsView({
                                   <p className="text-xs font-medium text-muted-foreground mb-1">
                                     Correct Answer:
                                   </p>
-                                  <p className="text-sm text-success font-medium">
+                                  <p
+                                    className="text-sm text-success font-medium whitespace-pre-wrap break-words"
+                                    style={{
+                                      display: "-webkit-box",
+                                      WebkitLineClamp: 4,
+                                      WebkitBoxOrient: "vertical",
+                                      overflow: "hidden",
+                                    }}
+                                  >
                                     {correctOption.label}
                                   </p>
                                 </div>

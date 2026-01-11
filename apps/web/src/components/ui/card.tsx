@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 interface CardProps {
   children: ReactNode;
@@ -6,16 +6,20 @@ interface CardProps {
   style?: React.CSSProperties;
 }
 
-export function Card({ children, className = "", style }: CardProps) {
-  return (
-    <div
-      className={`hover-lift glass-card rounded-lg ${className}`}
-      style={style}
-    >
-      {children}
-    </div>
-  );
-}
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ children, className = "", style }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={`hover-lift glass-card rounded-lg ${className}`}
+        style={style}
+      >
+        {children}
+      </div>
+    );
+  }
+);
+Card.displayName = "Card";
 
 interface CardHeaderProps {
   children: ReactNode;
@@ -29,11 +33,15 @@ export function CardHeader({ children, className = "" }: CardHeaderProps) {
 interface CardTitleProps {
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function CardTitle({ children, className = "" }: CardTitleProps) {
+export function CardTitle({ children, className = "", style }: CardTitleProps) {
   return (
-    <h3 className={`text-lg font-semibold text-foreground ${className}`}>
+    <h3
+      className={`text-lg font-semibold text-foreground ${className}`}
+      style={style}
+    >
       {children}
     </h3>
   );

@@ -39,14 +39,14 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <ClipboardList className="h-5 w-5 text-primary" />
             </div>
-            <div>
-              <CardTitle className="text-lg">{list.title}</CardTitle>
+            <div className="min-w-0">
+              <CardTitle className="text-lg truncate">{list.title}</CardTitle>
               {list.description && (
-                <CardDescription className="mt-1">
+                <CardDescription className="mt-1 whitespace-pre-wrap break-words">
                   {list.description}
                 </CardDescription>
               )}

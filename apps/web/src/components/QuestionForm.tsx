@@ -6,12 +6,14 @@ import { toast } from "sonner";
 import { QuestionType } from "@teachy/db";
 import { Question, Option } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/ui/form-field";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select } from "@/components/ui/select";
 import React from "react";
+import { useQuestionValidation } from "@/hooks/use-question-validation";
 
 interface QuestionFormProps {
   onAddQuestion: (question: Question) => void;
@@ -89,36 +91,26 @@ export function QuestionForm({
     setCorrectOptionIndex(idx);
   };
 
-  const isValid = React.useMemo(() => {
-    if (!title.trim()) return false;
-
-    if (questionType === QuestionType.MULTIPLE_CHOICE) {
-      if (options.some((opt) => !opt.label.trim())) return false;
-      if (correctOptionIndex === null) return false;
-    }
-
-    return true;
-  }, [title, questionType, options, correctOptionIndex]);
+  const { isValid, titleError, optionsError, correctOptionError } =
+    useQuestionValidation(title, questionType, options, correctOptionIndex);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     if (!isValid) {
-      if (!title.trim()) {
-        toast.error("Please enter a question title.");
+      if (titleError) {
+        toast.error(titleError);
         return;
       }
 
-      if (questionType === QuestionType.MULTIPLE_CHOICE) {
-        if (options.some((opt) => !opt.label.trim())) {
-          toast.error("Please fill in all options.");
-          return;
-        }
+      if (optionsError) {
+        toast.error(optionsError);
+        return;
+      }
 
-        if (correctOptionIndex === null) {
-          toast.error("Please select a correct answer.");
-          return;
-        }
+      if (correctOptionError) {
+        toast.error(correctOptionError);
+        return;
       }
       return;
     }
@@ -200,16 +192,19 @@ export function QuestionForm({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="question-title">Question Text</Label>
-            <Input
-              id="question-title"
-              type="text"
-              placeholder="Enter your question..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
+          <FormField
+            label="Question Text"
+            as="textarea"
+            id="question-title"
+            name="question-title"
+            placeholder="Enter your question..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => setTitle((s) => s.trim())}
+            maxLength={500}
+            rows={1}
+            autoGrow
+          />
 
           {questionType === QuestionType.MULTIPLE_CHOICE && (
             <div className="space-y-3">
@@ -228,14 +223,22 @@ export function QuestionForm({
                       value={index.toString()}
                       id={`option-${index}`}
                     />
-                    <Input
-                      placeholder={`Option ${index + 1}`}
-                      value={option.label}
-                      onChange={(e) =>
-                        handleOptionChange(index, e.target.value)
-                      }
-                      className="flex-1"
-                    />
+                    <div className="flex-1 flex items-center gap-2">
+                      <Textarea
+                        placeholder={`Option ${index + 1}`}
+                        value={option.label}
+                        onChange={(e) =>
+                          handleOptionChange(index, e.target.value)
+                        }
+                        onBlur={() =>
+                          handleOptionChange(index, option.label.trim())
+                        }
+                        maxLength={255}
+                        rows={1}
+                        autoGrow
+                        className="flex-1"
+                      />
+                    </div>
                     {options.length > 2 && (
                       <Button
                         type="button"

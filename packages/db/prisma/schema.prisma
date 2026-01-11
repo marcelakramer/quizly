@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
+  id            String   @id @default(cuid())
+  name          String   @db.VarChar(100)
+  email         String   @unique @db.VarChar(255)
   role          UserRole
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime @default(now())
+
   exerciseLists ExerciseList[]
   submissions   Submission[]
 
@@ -21,12 +22,13 @@ model User {
 }
 
 model ExerciseList {
-  id          String       @id @default(cuid())
-  title       String
-  description String?
-  shareCode   String       @unique
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(150)
+  description String?  @db.VarChar(500)
+  shareCode   String   @unique @db.VarChar(32)
   teacherId   String
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime @default(now())
+
   teacher     User         @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   questions   Question[]
   submissions Submission[]
@@ -40,9 +42,10 @@ model Question {
   id             String       @id @default(cuid())
   exerciseListId String
   type           QuestionType
-  title          String
+  title          String       @db.VarChar(500)
   order          Int
   createdAt      DateTime     @default(now())
+
   answers        Answer[]
   options        Option[]
   exerciseList   ExerciseList @relation(fields: [exerciseListId], references: [id], onDelete: Cascade)
@@ -54,9 +57,10 @@ model Question {
 model Option {
   id         String   @id @default(cuid())
   questionId String
-  label      String
+  label      String   @db.VarChar(255)
   isCorrect  Boolean
   createdAt  DateTime @default(now())
+
   answers    Answer[]
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
@@ -65,11 +69,11 @@ model Option {
 }
 
 model Submission {
-  id             String       @id @default(cuid())
+  id             String   @id @default(cuid())
   exerciseListId String
   studentId      String
   score          Float
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime @default(now())
   answers        Answer[]
   exerciseList   ExerciseList @relation(fields: [exerciseListId], references: [id], onDelete: Cascade)
   student        User         @relation(fields: [studentId], references: [id], onDelete: Cascade)
@@ -85,8 +89,9 @@ model Answer {
   submissionId     String
   questionId       String
   selectedOptionId String?
-  textAnswer       String?
+  textAnswer       String?    @db.VarChar(2000)
   createdAt        DateTime   @default(now())
+
   question         Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
   selectedOption   Option?    @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
   submission       Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)

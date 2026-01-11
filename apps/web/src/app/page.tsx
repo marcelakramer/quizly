@@ -5,16 +5,10 @@ import { ClipboardList, Users, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRole } from "@teachy/db";
 import { Button } from "@/components/ui/button";
+import { getDashboardPathForRole } from "@/lib/utils/role";
 
 export default function Home() {
   const { firebaseUser, dbUser } = useAuth();
-
-  const getDashboardUrl = () => {
-    if (dbUser?.role === UserRole.TEACHER) {
-      return "/teacher/dashboard";
-    }
-    return "/student/dashboard";
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,7 +28,7 @@ export default function Home() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-2">
             {firebaseUser && dbUser ? (
               <Button asChild size="lg">
-                <Link href={getDashboardUrl()}>
+                <Link href={getDashboardPathForRole(dbUser.role as UserRole)}>
                   Go to Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

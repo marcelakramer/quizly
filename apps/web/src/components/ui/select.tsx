@@ -68,8 +68,11 @@ export function Select({
       >
         <span
           className={
-            selectedOption ? "text-foreground" : "text-muted-foreground"
+            selectedOption
+              ? "text-foreground whitespace-pre-wrap truncate"
+              : "text-muted-foreground"
           }
+          title={selectedOption ? selectedOption.label : undefined}
         >
           {selectedOption ? selectedOption.label : placeholder}
         </span>
@@ -103,7 +106,9 @@ export function Select({
                   {value !== option.value && (
                     <div className="h-4 w-4 flex-shrink-0" />
                   )}
-                  <span className="flex-1 text-left">{option.label}</span>
+                  <span className="flex-1 text-left whitespace-pre-wrap break-words">
+                    {option.label}
+                  </span>
                 </div>
               </button>
             ))}

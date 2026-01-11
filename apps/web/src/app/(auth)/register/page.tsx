@@ -6,14 +6,24 @@ import { getAuthInstance } from "@teachy/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UserRole } from "@teachy/db";
+import { getDashboardPathForRole } from "@/lib/utils/role";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
+import { RoleCard } from "@/components/RoleCard";
 import { Logo } from "@/components/Logo";
-import { UserPlus, Mail, Lock, User, GraduationCap } from "lucide-react";
+import {
+  UserPlus,
+  Mail,
+  Lock,
+  User,
+  GraduationCap,
+  UserPen,
+} from "lucide-react";
 import { toast } from "sonner";
+import { useRegisterValidation } from "@/hooks/use-register-validation";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -22,18 +32,34 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState<UserRole>("STUDENT");
   const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState({
+    name: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
   const router = useRouter();
+  const {
+    isValid,
+    nameError,
+    emailError,
+    passwordError,
+    confirmPasswordError,
+  } = useRegisterValidation(name, email, password, confirmPassword);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
+    if (!isValid) {
+      if (nameError) {
+        toast.error(nameError);
+      } else if (emailError) {
+        toast.error(emailError);
+      } else if (passwordError) {
+        toast.error(passwordError);
+      } else if (confirmPasswordError) {
+        toast.error(confirmPasswordError);
+      }
       return;
     }
 
@@ -53,9 +79,7 @@ export default function RegisterPage() {
 
       toast.success("Account created successfully!");
 
-      router.replace(
-        role === UserRole.TEACHER ? "/teacher/dashboard" : "/student/dashboard"
-      );
+      router.replace(getDashboardPathForRole(role));
     } catch (err) {
       const errorMessage =
         err instanceof Error
@@ -85,150 +109,125 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Full Name
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              required
-              placeholder="Your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={loading}
-            />
-          </div>
+          <FormField
+            label="Full Name"
+            labelIcon={User}
+            id="name"
+            name="name"
+            type="text"
+            autoComplete="name"
+            required
+            placeholder="Your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => {
+              setName((s) => s.trim());
+              setTouched((prev) => ({ ...prev, name: true }));
+            }}
+            maxLength={100}
+            disabled={loading}
+            error={nameError}
+            touched={touched.name}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Email address
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-            />
-          </div>
+          <FormField
+            label="Email address"
+            labelIcon={Mail}
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => {
+              setEmail((s) => s.trim());
+              setTouched((prev) => ({ ...prev, email: true }));
+            }}
+            maxLength={255}
+            disabled={loading}
+            error={emailError}
+            touched={touched.email}
+          />
 
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
-              <User className="h-4 w-4" />I am a
+              <UserPen className="h-4 w-4" />I am a
             </Label>
             <RadioGroup
               value={role}
               onValueChange={(value) => setRole(value as UserRole)}
               className="grid grid-cols-2 gap-4 items-stretch !space-y-0"
             >
-              <div className="relative flex">
-                <RadioGroupItem
-                  value="STUDENT"
-                  id="student"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="student"
-                  className={`flex flex-col items-center justify-center rounded-md border-2 p-4 cursor-pointer transition-all h-[100px] w-full ${
-                    role === UserRole.STUDENT
-                      ? "border-primary bg-primary/5"
-                      : "border-muted bg-background hover:bg-accent hover:text-white"
-                  }`}
-                >
-                  <GraduationCap
-                    className={`h-6 w-6 mb-2 ${
-                      role === UserRole.STUDENT ? "text-primary" : ""
-                    }`}
-                  />
-                  <span
-                    className={`text-sm font-medium ${
-                      role === UserRole.STUDENT ? "text-primary" : ""
-                    }`}
-                  >
-                    Student
-                  </span>
-                </Label>
-              </div>
-              <div className="relative flex">
-                <RadioGroupItem
-                  value="TEACHER"
-                  id="teacher"
-                  className="peer sr-only"
-                />
-                <Label
-                  htmlFor="teacher"
-                  className={`flex flex-col items-center justify-center rounded-md border-2 p-4 cursor-pointer transition-all h-[100px] w-full ${
-                    role === UserRole.TEACHER
-                      ? "border-primary bg-primary/5"
-                      : "border-muted bg-background hover:bg-accent hover:text-white"
-                  }`}
-                >
-                  <User
-                    className={`h-6 w-6 mb-2 ${
-                      role === UserRole.TEACHER ? "text-primary" : ""
-                    }`}
-                  />
-                  <span
-                    className={`text-sm font-medium ${
-                      role === UserRole.TEACHER ? "text-primary" : ""
-                    }`}
-                  >
-                    Teacher
-                  </span>
-                </Label>
-              </div>
+              <RoleCard
+                id="student"
+                value="STUDENT"
+                selected={role === UserRole.STUDENT}
+                Icon={GraduationCap}
+              >
+                Student
+              </RoleCard>
+
+              <RoleCard
+                id="teacher"
+                value="TEACHER"
+                selected={role === UserRole.TEACHER}
+                Icon={User}
+              >
+                Teacher
+              </RoleCard>
             </RadioGroup>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center gap-2">
-              <Lock className="h-4 w-4" />
-              Password
-            </Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              placeholder="Minimum 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-          </div>
+          <FormField
+            label="Password"
+            labelIcon={Lock}
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            placeholder="Minimum 6 characters"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => {
+              setPassword((s) => s.trim());
+              setTouched((prev) => ({ ...prev, password: true }));
+            }}
+            maxLength={128}
+            disabled={loading}
+            error={passwordError}
+            touched={touched.password}
+          />
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="confirmPassword"
-              className="flex items-center gap-2"
-            >
-              <Lock className="h-4 w-4" />
-              Confirm Password
-            </Label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={loading}
-            />
-          </div>
+          <FormField
+            label="Confirm Password"
+            labelIcon={Lock}
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+            placeholder="Confirm your password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            onBlur={() => {
+              setConfirmPassword((s) => s.trim());
+              setTouched((prev) => ({ ...prev, confirmPassword: true }));
+            }}
+            maxLength={128}
+            disabled={loading}
+            error={confirmPasswordError}
+            touched={touched.confirmPassword}
+          />
 
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={loading || !isValid}
+          >
             {loading ? (
               "Creating account..."
             ) : (

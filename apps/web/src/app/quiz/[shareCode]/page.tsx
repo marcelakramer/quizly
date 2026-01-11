@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
@@ -33,6 +34,7 @@ import { getAuthInstance } from "@teachy/firebase";
 import { UserRole, QuestionType } from "@teachy/db";
 import { QuizStep, QuizList, SubmissionResult } from "@/types";
 import { getResultMessage } from "@/lib/utils/exercise";
+import { useQuizValidation } from "@/hooks/use-quiz-validation";
 
 export default function StudentQuiz() {
   const params = useParams();
@@ -51,12 +53,16 @@ export default function StudentQuiz() {
   const [submitting, setSubmitting] = useState(false);
   const [existingSubmission, setExistingSubmission] =
     useState<SubmissionResult | null>(null);
+  const { allFilled: validatedAll } = useQuizValidation(
+    list?.questions || [],
+    answers,
+    textAnswers
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       if (!shareCode || !firebaseUser || !dbUser) return;
 
-      // Check if user is a student
       if (dbUser.role !== UserRole.STUDENT) {
         toast.error("Only students can take quizzes.");
         router.push("/");
@@ -144,6 +150,13 @@ export default function StudentQuiz() {
 
   const currentQuestion = list.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / list.questions.length) * 100;
+
+  const _allAnswersFilled = list.questions.every((question) => {
+    if (question.type === QuestionType.OPEN_ENDED) {
+      return textAnswers[question.id]?.trim() || false;
+    }
+    return !!answers[question.id];
+  });
 
   const handleStartQuiz = () => {
     setAnswers({});
@@ -474,7 +487,7 @@ export default function StudentQuiz() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full space-y-6">
+      <div className="max-w-3xl w-full space-y-6">
         <div className="opacity-0 animate-fade-up">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-muted-foreground">
@@ -492,28 +505,28 @@ export default function StudentQuiz() {
           key={currentQuestion.id}
         >
           <CardHeader>
-            <CardTitle className="text-xl leading-relaxed text-foreground">
+            <CardTitle className="text-2xl leading-relaxed text-foreground whitespace-pre-wrap break-words">
               {currentQuestion.title}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {currentQuestion.type === QuestionType.OPEN_ENDED ? (
-              <div className="space-y-2">
-                <Label
-                  htmlFor="text-answer"
-                  className="block text-sm font-medium"
-                >
-                  Your Answer
-                </Label>
-                <textarea
+              <>
+                <FormField
+                  as="textarea"
                   id="text-answer"
                   value={textAnswers[currentQuestion.id] || ""}
                   onChange={(e) => handleTextAnswerChange(e.target.value)}
+                  onBlur={(e) =>
+                    handleTextAnswerChange(e.currentTarget.value.trim())
+                  }
+                  maxLength={2000}
                   placeholder="Type your answer here..."
-                  rows={6}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  rows={7}
+                  autoGrow
+                  showCounter
                 />
-              </div>
+              </>
             ) : (
               <RadioGroup
                 value={answers[currentQuestion.id] || ""}
@@ -523,7 +536,7 @@ export default function StudentQuiz() {
                 {currentQuestion.options.map((option) => (
                   <div
                     key={option.id}
-                    className={`flex items-center space-x-3 rounded-lg border-2 p-4 transition-all cursor-pointer ${
+                    className={`flex items-center space-x-3 rounded-lg border-2 p-4 w-full min-w-0 transition-all cursor-pointer ${
                       answers[currentQuestion.id] === option.id
                         ? "border-primary bg-primary/5"
                         : "border-border hover:border-primary/50"
@@ -533,7 +546,7 @@ export default function StudentQuiz() {
                     <RadioGroupItem value={option.id} id={option.id} />
                     <Label
                       htmlFor={option.id}
-                      className="flex-1 cursor-pointer font-normal text-foreground"
+                      className="flex-1 min-w-0 cursor-pointer font-normal text-foreground whitespace-pre-wrap break-words text-lg"
                     >
                       {option.label}
                     </Label>
@@ -558,7 +571,10 @@ export default function StudentQuiz() {
           </Button>
 
           {currentQuestionIndex === list.questions.length - 1 ? (
-            <Button onClick={handleSubmit} disabled={submitting}>
+            <Button
+              onClick={handleSubmit}
+              disabled={submitting || !validatedAll}
+            >
               <Send className="mr-2 h-4 w-4" />
               {submitting ? "Submitting..." : "Submit Quiz"}
             </Button>

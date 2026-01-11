@@ -4,8 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/form-field";
 import {
   Card,
   CardContent,
@@ -154,23 +153,23 @@ export default function StudentDashboard() {
                   className="space-y-6 h-full flex flex-col"
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="shareCode">Quiz Code</Label>
-                    <div className="relative">
-                      <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="shareCode"
-                        type="text"
-                        placeholder="Enter quiz code (e.g., ABC123)"
-                        value={shareCode}
-                        onChange={(e) =>
-                          setShareCode(e.target.value.toUpperCase())
-                        }
-                        className="pl-10 font-mono tracking-widest"
-                        maxLength={6}
-                        disabled={loading}
-                        autoFocus
-                      />
-                    </div>
+                    <FormField
+                      label="Quiz Code"
+                      leftInnerIcon={Key}
+                      id="shareCode"
+                      name="shareCode"
+                      type="text"
+                      placeholder="Enter quiz code (e.g., ABC123)"
+                      value={shareCode}
+                      onChange={(e) =>
+                        setShareCode(e.target.value.toUpperCase())
+                      }
+                      className="font-mono tracking-widest"
+                      maxLength={6}
+                      disabled={loading}
+                      autoFocus
+                      showError={false}
+                    />
                     <p className="text-xs text-muted-foreground">
                       The code is usually 6 characters long
                     </p>

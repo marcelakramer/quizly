@@ -7,6 +7,7 @@ import { QuestionType } from "@teachy/db";
 import { Question } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import TitleClamp from "./TitleClamp";
 
 interface QuestionPreviewProps {
   question: Question;
@@ -55,8 +56,8 @@ export function QuestionPreview({
             </span>
           </div>
 
-          <div className="flex-1 space-y-3">
-            <p className="font-medium">{question.title}</p>
+          <div className="flex-1 min-w-0 space-y-3">
+            <TitleClamp title={question.title} />
             {question.type === QuestionType.OPEN_ENDED ? (
               <div className="rounded-lg px-3 py-2 text-sm bg-muted/50 text-muted-foreground">
                 Open-ended question
@@ -66,14 +67,18 @@ export function QuestionPreview({
                 {question.options.map((option, optIndex) => (
                   <div
                     key={optIndex}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm w-full min-w-0 ${
                       option.isCorrect
                         ? "bg-success/10 text-success"
                         : "bg-muted/50"
                     }`}
                   >
-                    {option.isCorrect && <Check className="h-6 w-6" />}
-                    <span>{option.label}</span>
+                    {option.isCorrect && (
+                      <Check className="h-6 w-6 flex-shrink-0" />
+                    )}
+                    <span className="flex-1 min-w-0 whitespace-pre-wrap break-words">
+                      {option.label}
+                    </span>
                   </div>
                 ))}
               </div>
