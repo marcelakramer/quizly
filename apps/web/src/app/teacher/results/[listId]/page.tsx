@@ -129,7 +129,11 @@ export default function ViewResults() {
               <p className="mt-1 text-muted-foreground">{list.description}</p>
             )}
           </div>
-          <Button variant="outline" onClick={handleShare}>
+          <Button
+            variant="outline"
+            onClick={handleShare}
+            className="shrink-0 whitespace-nowrap"
+          >
             <Share2 className="mr-2 h-4 w-4" />
             Share Link
           </Button>

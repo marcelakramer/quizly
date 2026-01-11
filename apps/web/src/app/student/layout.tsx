@@ -1,9 +1,12 @@
 import { ProtectedLayout } from "@/components/ProtectedLayout";
+import { UserRole } from "@teachy/db";
 
 export default function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <ProtectedLayout>{children}</ProtectedLayout>;
+  return (
+    <ProtectedLayout allowedRole={UserRole.STUDENT}>{children}</ProtectedLayout>
+  );
 }

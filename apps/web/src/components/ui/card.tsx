@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import { cn } from "@/lib/utils/cn";
 
 interface CardProps {
   children: ReactNode;
@@ -39,7 +40,7 @@ interface CardTitleProps {
 export function CardTitle({ children, className = "", style }: CardTitleProps) {
   return (
     <h3
-      className={`text-lg font-semibold text-foreground ${className}`}
+      className={cn("text-lg font-semibold text-foreground", className)}
       style={style}
     >
       {children}

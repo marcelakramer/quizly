@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatDateTimeLong } from "@/lib/utils/date";
@@ -42,6 +42,7 @@ export default function StudentQuiz() {
   const router = useRouter();
   const shareCode = params.shareCode as string;
   const { firebaseUser, dbUser, loading: authLoading } = useAuth();
+  const teacherRedirectedRef = useRef(false);
 
   const [step, setStep] = useState<QuizStep>("intro");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -65,8 +66,22 @@ export default function StudentQuiz() {
       if (!shareCode || !firebaseUser || !dbUser) return;
 
       if (dbUser.role !== UserRole.STUDENT) {
-        toast.error("Only students can take quizzes.");
-        router.push("/");
+        if (!teacherRedirectedRef.current) {
+          teacherRedirectedRef.current = true;
+
+          try {
+            const listResult = await api.quiz.getByShareCode(shareCode);
+            if (listResult?.list?.teacher?.id === dbUser.id) {
+              router.replace(`/teacher/results/${listResult.list.id}`);
+              return;
+            }
+          } catch {
+            // Quiz not found or error, just redirect to dashboard
+          }
+
+          toast.error("Only students can take quizzes.");
+          router.replace("/teacher/dashboard");
+        }
         return;
       }
 
@@ -127,22 +142,29 @@ export default function StudentQuiz() {
   if (!list) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="glass-card max-w-md w-full">
-          <CardContent className="pt-6 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-                <XCircle className="h-8 w-8 text-destructive" />
+        <Card className="glass-card max-w-md w-full opacity-0 animate-scale-in">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10">
+                  <XCircle className="h-10 w-10 text-destructive" />
+                </div>
               </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-foreground">
+                  Quiz Not Found
+                </h1>
+                <p className="text-muted-foreground">
+                  This quiz doesn&apos;t exist or has been removed.
+                </p>
+              </div>
+              <Button asChild variant="outline">
+                <Link href="/student/dashboard">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Dashboard
+                </Link>
+              </Button>
             </div>
-            <h1 className="text-xl font-bold text-foreground">
-              Quiz not found
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              This quiz doesn&apos;t exist or has been removed
-            </p>
-            <Button asChild className="mt-4">
-              <Link href="/">Go Home</Link>
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -267,7 +289,7 @@ export default function StudentQuiz() {
                 <ClipboardList className="h-12 w-12 text-primary-foreground" />
               </div>
             </div>
-            <CardTitle className="text-4xl font-bold mb-4">
+            <CardTitle className="text-3xl font-bold mb-4">
               {list.title}
             </CardTitle>
             {list.description && (
@@ -500,7 +522,7 @@ export default function StudentQuiz() {
           key={currentQuestion.id}
         >
           <CardHeader>
-            <CardTitle className="text-2xl leading-relaxed text-foreground whitespace-pre-wrap break-words">
+            <CardTitle className="text-lg leading-relaxed text-foreground whitespace-pre-wrap break-words">
               {currentQuestion.title}
             </CardTitle>
           </CardHeader>

@@ -6,10 +6,10 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { SubmissionDetailsSkeleton } from "@/components/SubmissionDetailsSkeleton";
 import { SubmissionDetailsView } from "@/components/SubmissionDetailsView";
-import { User } from "lucide-react";
-import { toast } from "sonner";
+import { User, ShieldX, FileQuestion, ArrowLeft } from "lucide-react";
 import { UserRole } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
 
@@ -21,6 +21,10 @@ export default function SubmissionDetails() {
 
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<{
+    type: "not-found" | "forbidden" | "error";
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -31,7 +35,6 @@ export default function SubmissionDetails() {
         const idToken = await auth.currentUser?.getIdToken();
 
         if (!idToken) {
-          toast.error("You must be logged in.");
           router.push("/login");
           return;
         }
@@ -40,19 +43,25 @@ export default function SubmissionDetails() {
           await api.exercises.submissions.getById(idToken, submissionId);
 
         setSubmission(fetchedSubmission);
-      } catch (error) {
-        console.error("Error fetching submission details:", error);
-        toast.error(
-          error instanceof Error
-            ? error.message.endsWith(".")
-              ? error.message
-              : `${error.message}.`
-            : "Failed to load submission details."
-        );
-        if (dbUser?.role === UserRole.TEACHER) {
-          router.push("/teacher/dashboard");
+      } catch (err) {
+        console.error("Error fetching submission details:", err);
+        const message = err instanceof Error ? err.message : "";
+
+        if (message.toLowerCase().includes("forbidden")) {
+          setError({
+            type: "forbidden",
+            message: "You do not have permission to view this submission.",
+          });
+        } else if (message.toLowerCase().includes("not found")) {
+          setError({
+            type: "not-found",
+            message: "This submission could not be found.",
+          });
         } else {
-          router.push("/student/dashboard");
+          setError({
+            type: "error",
+            message: "Something went wrong while loading this submission.",
+          });
         }
       } finally {
         setLoading(false);
@@ -62,7 +71,12 @@ export default function SubmissionDetails() {
     if (!authLoading) {
       fetchSubmission();
     }
-  }, [firebaseUser, submissionId, router, authLoading, dbUser]);
+  }, [firebaseUser, submissionId, router, authLoading]);
+
+  const dashboardUrl =
+    dbUser?.role === UserRole.TEACHER
+      ? "/teacher/dashboard"
+      : "/student/dashboard";
 
   if (loading || authLoading) {
     return (
@@ -72,32 +86,93 @@ export default function SubmissionDetails() {
     );
   }
 
-  if (!submission) {
-    const dashboardUrl =
-      dbUser?.role === UserRole.TEACHER
-        ? "/teacher/dashboard"
-        : "/student/dashboard";
-    const backLabel =
-      dbUser?.role === UserRole.TEACHER
-        ? "Back to Dashboard"
-        : "Back to Dashboard";
+  if (error) {
+    const errorConfig = {
+      "not-found": {
+        icon: FileQuestion,
+        title: "Submission Not Found",
+        iconBg: "bg-muted/50",
+        iconColor: "text-muted-foreground",
+      },
+      forbidden: {
+        icon: ShieldX,
+        title: "Access Denied",
+        iconBg: "bg-destructive/10",
+        iconColor: "text-destructive",
+      },
+      error: {
+        icon: FileQuestion,
+        title: "Something Went Wrong",
+        iconBg: "bg-destructive/10",
+        iconColor: "text-destructive",
+      },
+    }[error.type];
+
+    const Icon = errorConfig.icon;
 
     return (
-      <div className="min-h-screen bg-background">
-        <main className="container py-8">
-          <div className="text-center py-16">
-            <h1 className="text-2xl font-bold text-foreground">
-              Submission not found
-            </h1>
-            <Button
-              variant="tertiary"
-              onClick={() => router.push(dashboardUrl)}
-              className="mt-4"
-            >
-              {backLabel}
-            </Button>
-          </div>
-        </main>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="glass-card max-w-md w-full opacity-0 animate-scale-in">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <div
+                  className={`flex h-20 w-20 items-center justify-center rounded-full ${errorConfig.iconBg}`}
+                >
+                  <Icon className={`h-10 w-10 ${errorConfig.iconColor}`} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-foreground">
+                  {errorConfig.title}
+                </h1>
+                <p className="text-muted-foreground">{error.message}</p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => router.push(dashboardUrl)}
+                className="mt-4"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!submission) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="glass-card max-w-md w-full opacity-0 animate-scale-in">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted/50">
+                  <FileQuestion className="h-10 w-10 text-muted-foreground" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-foreground">
+                  Submission Not Found
+                </h1>
+                <p className="text-muted-foreground">
+                  This submission could not be found.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => router.push(dashboardUrl)}
+                className="mt-4"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
