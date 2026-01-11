@@ -12,6 +12,14 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -26,6 +34,7 @@ import {
   User,
   FileText,
   Clock,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -55,6 +64,7 @@ export default function StudentQuiz() {
   const [submitting, setSubmitting] = useState(false);
   const [existingSubmission, setExistingSubmission] =
     useState<SubmissionResult | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   const { allFilled: validatedAll } = useQuizValidation(
     list?.questions || [],
     answers,
@@ -377,7 +387,7 @@ export default function StudentQuiz() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-border">
+                <div className="pt-4 border-t border-border space-y-3">
                   <Button
                     onClick={handleStartQuiz}
                     className="w-full"
@@ -386,6 +396,14 @@ export default function StudentQuiz() {
                   >
                     Start Quiz
                     <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => router.push("/student/dashboard")}
+                    className="w-full"
+                    size="lg"
+                  >
+                    Cancel
                   </Button>
                 </div>
               </>
@@ -589,21 +607,54 @@ export default function StudentQuiz() {
             Previous
           </Button>
 
-          {currentQuestionIndex === list.questions.length - 1 ? (
-            <Button
-              onClick={handleSubmit}
-              disabled={submitting || !validatedAll}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              {submitting ? "Submitting..." : "Submit Quiz"}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={() => setShowCancelDialog(true)}>
+              <X className="mr-2 h-4 w-4" />
+              Cancel
             </Button>
-          ) : (
-            <Button onClick={handleNext}>
-              Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+
+            {currentQuestionIndex === list.questions.length - 1 ? (
+              <Button
+                onClick={handleSubmit}
+                disabled={submitting || !validatedAll}
+              >
+                <Send className="mr-2 h-4 w-4" />
+                {submitting ? "Submitting..." : "Submit Quiz"}
+              </Button>
+            ) : (
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
+
+        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cancel Quiz?</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to cancel? Your progress will be lost and
+                you&apos;ll need to start over.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => setShowCancelDialog(false)}
+              >
+                Continue Quiz
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => router.push("/student/dashboard")}
+              >
+                Yes, Cancel
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

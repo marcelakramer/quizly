@@ -36,7 +36,8 @@ export function QuizIntroSkeleton() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-border">
+          <div className="pt-4 border-t border-border space-y-3">
+            <div className="h-11 w-full bg-muted rounded animate-pulse" />
             <div className="h-11 w-full bg-muted rounded animate-pulse" />
           </div>
         </CardContent>
