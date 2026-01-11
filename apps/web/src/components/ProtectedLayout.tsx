@@ -16,20 +16,20 @@ interface ProtectedLayoutProps {
  * - Uses router.replace to avoid adding to history
  */
 export function ProtectedLayout({ children }: ProtectedLayoutProps) {
-  const { user, loading } = useAuth();
+  const { firebaseUser, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !firebaseUser) {
       router.replace("/login");
     }
-  }, [user, loading, router]);
+  }, [firebaseUser, loading, router]);
 
   if (loading) {
     return <SplashScreen />;
   }
 
-  if (!user) {
+  if (!firebaseUser) {
     return null;
   }
 

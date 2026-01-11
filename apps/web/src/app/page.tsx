@@ -1,7 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import { ClipboardList, Users, CheckCircle } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import { UserRole } from "@teachy/db";
 
 export default function Home() {
+  const { firebaseUser, dbUser } = useAuth();
+
+  const getDashboardUrl = () => {
+    if (dbUser?.role === UserRole.TEACHER) {
+      return "/teacher/dashboard";
+    }
+    return "/student/dashboard";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -18,18 +31,29 @@ export default function Home() {
             your students&apos; progress—all in one place.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all border-2 border-transparent"
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center bg-background hover:bg-muted text-primary border-2 border-primary px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all"
-            >
-              Sign In
-            </Link>
+            {firebaseUser && dbUser ? (
+              <Link
+                href={getDashboardUrl()}
+                className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all border-2 border-transparent"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all border-2 border-transparent"
+                >
+                  Get Started
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center bg-background hover:bg-muted text-primary border-2 border-primary px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>

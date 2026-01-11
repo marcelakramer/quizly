@@ -18,7 +18,7 @@ import { getResultMessage } from "@/lib/utils/exercise";
 export default function SubmissionDetails() {
   const params = useParams();
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { firebaseUser, loading: authLoading } = useAuth();
   const listId = params.listId as string;
   const submissionId = params.submissionId as string;
 
@@ -27,7 +27,7 @@ export default function SubmissionDetails() {
 
   useEffect(() => {
     const fetchSubmission = async () => {
-      if (!user || !submissionId) return;
+      if (!firebaseUser || !submissionId) return;
 
       try {
         const auth = getAuthInstance();
@@ -61,7 +61,7 @@ export default function SubmissionDetails() {
     if (!authLoading) {
       fetchSubmission();
     }
-  }, [user, submissionId, listId, router, authLoading]);
+  }, [firebaseUser, submissionId, listId, router, authLoading]);
 
   if (loading || authLoading) {
     return <LoadingSpinner />;

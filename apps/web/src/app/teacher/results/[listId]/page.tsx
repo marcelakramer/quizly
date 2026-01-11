@@ -18,7 +18,7 @@ import { Submission, ExerciseListSummary } from "@/types";
 export default function ViewResults() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const listId = params.listId as string;
 
   const [list, setList] = useState<ExerciseListSummary | null>(null);
@@ -27,7 +27,7 @@ export default function ViewResults() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user || !listId) return;
+      if (!firebaseUser || !listId) return;
 
       try {
         const auth = getAuthInstance();
@@ -59,7 +59,7 @@ export default function ViewResults() {
     };
 
     fetchData();
-  }, [user, listId, router]);
+  }, [firebaseUser, listId, router]);
 
   if (loading) {
     return <LoadingSpinner />;

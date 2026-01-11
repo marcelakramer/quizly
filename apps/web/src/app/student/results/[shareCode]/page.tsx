@@ -25,7 +25,7 @@ import { getResultMessage } from "@/lib/utils/exercise";
 export default function StudentResults() {
   const params = useParams();
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { firebaseUser, loading: authLoading } = useAuth();
   const shareCode = params.shareCode as string;
 
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
@@ -33,7 +33,7 @@ export default function StudentResults() {
 
   useEffect(() => {
     const fetchSubmission = async () => {
-      if (!user || !shareCode) return;
+      if (!firebaseUser || !shareCode) return;
 
       try {
         const auth = getAuthInstance();
@@ -81,7 +81,7 @@ export default function StudentResults() {
     if (!authLoading) {
       fetchSubmission();
     }
-  }, [user, shareCode, router, authLoading]);
+  }, [firebaseUser, shareCode, router, authLoading]);
 
   if (loading || authLoading) {
     return <LoadingSpinner />;

@@ -30,7 +30,7 @@ import { Question } from "@/types";
 
 export default function CreateList() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -106,7 +106,7 @@ export default function CreateList() {
       return;
     }
 
-    if (!user) {
+    if (!firebaseUser) {
       toast.error("You must be logged in to create an exercise list.");
       return;
     }

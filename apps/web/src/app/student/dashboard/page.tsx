@@ -37,7 +37,7 @@ import { StudentSubmission } from "@/types";
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { firebaseUser, loading: authLoading } = useAuth();
   const [shareCode, setShareCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
@@ -45,7 +45,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const fetchSubmissions = async () => {
-      if (!user || authLoading) return;
+      if (!firebaseUser || authLoading) return;
 
       try {
         const auth = getAuthInstance();
@@ -66,7 +66,7 @@ export default function StudentDashboard() {
     };
 
     fetchSubmissions();
-  }, [user, authLoading]);
+  }, [firebaseUser, authLoading]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

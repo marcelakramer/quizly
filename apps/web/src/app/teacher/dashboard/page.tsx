@@ -12,7 +12,7 @@ import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";
 
 export default function TeacherDashboard() {
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const [exerciseLists, setExerciseLists] = useState<
     ExerciseListWithRelations[]
   >([]);
@@ -20,7 +20,7 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     const fetchExerciseLists = async () => {
-      if (!user) return;
+      if (!firebaseUser) return;
 
       try {
         const auth = getAuthInstance();
@@ -37,7 +37,7 @@ export default function TeacherDashboard() {
     };
 
     fetchExerciseLists();
-  }, [user]);
+  }, [firebaseUser]);
 
   if (loading) {
     return <LoadingSpinner />;

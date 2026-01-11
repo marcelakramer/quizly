@@ -7,8 +7,6 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
-import { User } from "@teachy/db";
 import { getInitials } from "@/lib/utils/user";
 import { Logo } from "./Logo";
 
@@ -16,39 +14,11 @@ const publicRoutes = ["/login", "/register"];
 const publicRoutePrefixes = ["/quiz"];
 
 export function Header() {
-  const { user, loading } = useAuth();
+  const { firebaseUser, dbUser } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [dbUser, setDbUser] = useState<User | null>(null);
-  const [loadingUser, setLoadingUser] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user) {
-        setLoadingUser(true);
-        try {
-          const auth = getAuthInstance();
-          // Force token refresh to get latest user data
-          const idToken = await auth.currentUser?.getIdToken(true);
-          if (idToken) {
-            const { user: userData } = await api.auth.me(idToken);
-            setDbUser(userData);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        } finally {
-          setLoadingUser(false);
-        }
-      } else {
-        setDbUser(null);
-        setLoadingUser(false);
-      }
-    };
-
-    fetchUserData();
-  }, [user, pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,7 +41,7 @@ export function Header() {
       const auth = getAuthInstance();
       await signOut(auth);
       setMenuOpen(false);
-      router.push("/");
+      router.push("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -82,7 +52,7 @@ export function Header() {
     pathname.startsWith(prefix)
   );
 
-  if (loading || isPublicRoute || isPublicPrefix) {
+  if (isPublicRoute || isPublicPrefix) {
     return null;
   }
 
@@ -99,7 +69,7 @@ export function Header() {
           <span className="text-gray-900">Quizly</span>
         </Link>
 
-        {user && !loadingUser && initials ? (
+        {firebaseUser && dbUser && initials ? (
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -112,9 +82,11 @@ export function Header() {
               <div className="absolute right-4 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-200">
                 <div className="px-4 py-2 border-b border-gray-200">
                   <p className="text-sm font-medium text-gray-900">
-                    {dbUser?.name || "User"}
+                    {dbUser.name || "User"}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {firebaseUser.email}
+                  </p>
                 </div>
                 <button
                   onClick={handleLogout}

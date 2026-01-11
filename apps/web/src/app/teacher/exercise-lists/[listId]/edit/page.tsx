@@ -42,7 +42,7 @@ export default function EditList() {
   const router = useRouter();
   const params = useParams();
   const listId = params.listId as string;
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -63,7 +63,7 @@ export default function EditList() {
 
   useEffect(() => {
     const fetchList = async () => {
-      if (!user || !listId) return;
+      if (!firebaseUser || !listId) return;
 
       try {
         const auth = getAuthInstance();
@@ -112,10 +112,10 @@ export default function EditList() {
       }
     };
 
-    if (user) {
+    if (firebaseUser) {
       fetchList();
     }
-  }, [user, listId, router]);
+  }, [firebaseUser, listId, router]);
 
   const handleAddQuestion = (question: Question) => {
     const questionWithOrder = {
@@ -177,7 +177,7 @@ export default function EditList() {
       return;
     }
 
-    if (!user) {
+    if (!firebaseUser) {
       toast.error("You must be logged in to update an exercise list.");
       return;
     }
@@ -220,7 +220,7 @@ export default function EditList() {
   };
 
   const handleDelete = async () => {
-    if (!user) {
+    if (!firebaseUser) {
       toast.error("You must be logged in to delete an exercise list.");
       return;
     }

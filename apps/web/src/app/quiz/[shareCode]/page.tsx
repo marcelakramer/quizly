@@ -38,12 +38,9 @@ export default function StudentQuiz() {
   const params = useParams();
   const router = useRouter();
   const shareCode = params.shareCode as string;
-  const { user, loading: authLoading } = useAuth();
+  const { firebaseUser, dbUser, loading: authLoading } = useAuth();
 
   const [step, setStep] = useState<QuizStep>("intro");
-  const [dbUser, setDbUser] = useState<{ name: string; role: UserRole } | null>(
-    null
-  );
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
@@ -57,7 +54,14 @@ export default function StudentQuiz() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!shareCode) return;
+      if (!shareCode || !firebaseUser || !dbUser) return;
+
+      // Check if user is a student
+      if (dbUser.role !== UserRole.STUDENT) {
+        toast.error("Only students can take quizzes.");
+        router.push("/");
+        return;
+      }
 
       try {
         const auth = getAuthInstance();
@@ -69,9 +73,8 @@ export default function StudentQuiz() {
           return;
         }
 
-        const [listResult, userResult, submissionResult] = await Promise.all([
+        const [listResult, submissionResult] = await Promise.all([
           api.quiz.getByShareCode(shareCode),
-          api.auth.me(idToken),
           api.quiz
             .checkSubmission(idToken, shareCode)
             .catch(() => ({ hasSubmission: false })),
@@ -80,15 +83,6 @@ export default function StudentQuiz() {
         if (listResult && listResult.list) {
           const listWithTeacher = listResult.list as QuizList;
           setList(listWithTeacher);
-        }
-
-        if (userResult?.user) {
-          if (userResult.user.role !== UserRole.STUDENT) {
-            toast.error("Only students can take quizzes.");
-            router.push("/");
-            return;
-          }
-          setDbUser(userResult.user);
         }
 
         if (
@@ -110,14 +104,14 @@ export default function StudentQuiz() {
 
     if (authLoading) return;
 
-    if (!user) {
+    if (!firebaseUser || !dbUser) {
       toast.error("You must be logged in to take this quiz.");
       router.push("/login");
       return;
     }
 
     fetchData();
-  }, [shareCode, user, authLoading, router]);
+  }, [shareCode, firebaseUser, dbUser, authLoading, router]);
 
   if (loading || authLoading || !dbUser) {
     return <LoadingSpinner />;
@@ -198,7 +192,7 @@ export default function StudentQuiz() {
       return;
     }
 
-    if (!user || !dbUser) {
+    if (!firebaseUser || !dbUser) {
       toast.error("You must be logged in to submit.");
       return;
     }
