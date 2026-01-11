@@ -5,6 +5,7 @@ import { ClipboardList, Users, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRole } from "@teachy/db";
 import { Button } from "@/components/ui/button";
+import { FeatureCard } from "@/components/FeatureCard";
 import { getDashboardPathForRole } from "@/lib/utils/role";
 
 export default function Home() {
@@ -48,44 +49,26 @@ export default function Home() {
       {/* Features */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="grid gap-6 md:grid-cols-3">
-          <div className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-4">
-              <ClipboardList className="h-6 w-6 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-foreground">
-              Create Lists
-            </h3>
-            <p className="text-muted-foreground">
-              Build exercise lists with multiple-choice questions. Add as many
-              questions and options as you need.
-            </p>
-          </div>
-
-          <div className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up [animation-delay:150ms]">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 mb-4">
-              <Users className="h-6 w-6 text-accent" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-foreground">
-              Share Easily
-            </h3>
-            <p className="text-muted-foreground">
-              Share a simple link with your students. They can take the quiz
-              from any device, no login required.
-            </p>
-          </div>
-
-          <div className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up [animation-delay:300ms]">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 mb-4">
-              <CheckCircle className="h-6 w-6 text-success" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2 text-foreground">
-              Track Results
-            </h3>
-            <p className="text-muted-foreground">
-              View all student submissions in one place. See scores, averages,
-              and individual responses.
-            </p>
-          </div>
+          <FeatureCard
+            icon={ClipboardList}
+            title="Create Lists"
+            description="Build exercise lists with multiple-choice questions. Add as many questions and options as you need."
+            colorClass="primary"
+          />
+          <FeatureCard
+            icon={Users}
+            title="Share Easily"
+            description="Share a simple link with your students. They can take the quiz from any device, no login required."
+            colorClass="accent"
+            animationDelay="150ms"
+          />
+          <FeatureCard
+            icon={CheckCircle}
+            title="Track Results"
+            description="View all student submissions in one place. See scores, averages, and individual responses."
+            colorClass="success"
+            animationDelay="300ms"
+          />
         </div>
       </section>
 
