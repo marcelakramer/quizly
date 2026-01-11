@@ -13,6 +13,10 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
+import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
@@ -66,6 +70,7 @@ export function ExerciseListForm({
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
     null
   );
+  const [newQuestionIds, setNewQuestionIds] = useState<Set<string>>(new Set());
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -117,6 +122,15 @@ export function ExerciseListForm({
       order: questions.length,
     };
     setQuestions([...questions, questionWithOrder]);
+    setNewQuestionIds((prev) => new Set(prev).add(question.id));
+    // Remove from newQuestionIds after animation completes
+    setTimeout(() => {
+      setNewQuestionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(question.id);
+        return next;
+      });
+    }, 500);
   };
 
   const handleRemoveQuestion = (id: string) => {
@@ -390,12 +404,13 @@ export function ExerciseListForm({
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
             >
               <SortableContext
                 items={questions.map((q) => q.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {questions.map((question, index) => (
                     <QuestionPreview
                       key={question.id}
@@ -403,6 +418,7 @@ export function ExerciseListForm({
                       index={index}
                       onRemove={handleRemoveQuestion}
                       onEdit={handleEditQuestion}
+                      isNew={newQuestionIds.has(question.id)}
                     />
                   ))}
                 </div>
