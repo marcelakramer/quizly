@@ -123,15 +123,9 @@ export default function LoginPage() {
           </span>
           <Link
             href="/register"
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
+            className="text-primary hover:text-primary/80 font-medium transition-colors ml-1"
           >
             Register here
-          </Link>
-        </div>
-
-        <div className="text-center text-xs text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            ← Back to home
           </Link>
         </div>
       </div>

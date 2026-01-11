@@ -1,23 +1,18 @@
 "use client";
 
-import {
-  X,
-  CheckCircle2,
-  Circle,
-  GripVertical,
-  Edit,
-  FileText,
-} from "lucide-react";
+import { Check, Trash2, GripVertical, Edit } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { QuestionType } from "@teachy/db";
 import { Question } from "@/types";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface QuestionPreviewProps {
   question: Question;
   index: number;
   onRemove: (id: string) => void;
-  onEdit: (id: string) => void;
+  onEdit?: (id: string) => void;
 }
 
 export function QuestionPreview({
@@ -42,85 +37,71 @@ export function QuestionPreview({
   };
 
   return (
-    <div
+    <Card
       ref={setNodeRef}
       style={style}
-      className="glass-card rounded-lg p-6 relative"
+      className="glass-card animate-scale-in"
     >
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-        <button
-          onClick={() => onEdit(question.id)}
-          className="p-1 text-muted-foreground hover:text-primary transition-colors"
-          aria-label="Edit question"
-        >
-          <Edit className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => onRemove(question.id)}
-          className="p-1 text-muted-foreground hover:text-destructive transition-colors"
-          aria-label="Remove question"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+      <CardContent className="pt-4">
+        <div className="flex items-start gap-3">
+          <div
+            {...attributes}
+            {...listeners}
+            className="flex items-center gap-2 text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
+          >
+            <GripVertical className="h-7 w-7" />
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-base font-medium text-primary">
+              {index + 1}
+            </span>
+          </div>
 
-      <div className="flex items-start gap-3 mb-4">
-        <button
-          {...attributes}
-          {...listeners}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm cursor-grab active:cursor-grabbing hover:bg-primary/20 transition-colors touch-none"
-          aria-label="Drag to reorder"
-        >
-          <GripVertical className="h-4 w-4" />
-        </button>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
-          {index + 1}
-        </div>
-        <div className="flex-1">
-          <h4 className="font-semibold text-foreground mb-3">
-            {question.title}
-          </h4>
-          {question.type === QuestionType.OPEN_ENDED ? (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted/50 border border-border">
-              <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm text-muted-foreground">
-                Students will provide a text answer
-              </span>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {question.options.map((option, optIndex) => (
-                <div
-                  key={optIndex}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md ${
-                    option.isCorrect
-                      ? "bg-success/10 border border-success/20"
-                      : "bg-muted"
-                  }`}
-                >
-                  {option.isCorrect ? (
-                    <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" />
-                  ) : (
-                    <Circle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  )}
-                  <span
-                    className={
-                      option.isCorrect ? "text-success font-medium" : ""
-                    }
+          <div className="flex-1 space-y-3">
+            <p className="font-medium">{question.title}</p>
+            {question.type === QuestionType.OPEN_ENDED ? (
+              <div className="rounded-lg px-3 py-2 text-sm bg-muted/50 text-muted-foreground">
+                Open-ended question
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                {question.options.map((option, optIndex) => (
+                  <div
+                    key={optIndex}
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+                      option.isCorrect
+                        ? "bg-success/10 text-success"
+                        : "bg-muted/50"
+                    }`}
                   >
-                    {option.label}
-                  </span>
-                  {option.isCorrect && (
-                    <span className="ml-auto text-xs text-success font-medium">
-                      Correct
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                    {option.isCorrect && <Check className="h-6 w-6" />}
+                    <span>{option.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onEdit(question.id)}
+                className="h-10 w-10 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10"
+              >
+                <Edit className="h-6 w-6" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onRemove(question.id)}
+              className="h-10 w-10 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-6 w-6" />
+            </Button>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

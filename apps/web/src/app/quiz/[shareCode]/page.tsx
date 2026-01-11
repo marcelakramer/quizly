@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { LoadingSpinner, LoadingIcon } from "@/components/LoadingIcon";
+import { QuizIntroSkeleton } from "@/components/QuizIntroSkeleton";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { UserRole, QuestionType } from "@teachy/db";
@@ -114,7 +114,7 @@ export default function StudentQuiz() {
   }, [shareCode, firebaseUser, dbUser, authLoading, router]);
 
   if (loading || authLoading || !dbUser) {
-    return <LoadingSpinner />;
+    return <QuizIntroSkeleton />;
   }
 
   if (!list) {
@@ -122,6 +122,11 @@ export default function StudentQuiz() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="glass-card max-w-md w-full">
           <CardContent className="pt-6 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
+                <XCircle className="h-8 w-8 text-destructive" />
+              </div>
+            </div>
             <h1 className="text-xl font-bold text-foreground">
               Quiz not found
             </h1>
@@ -241,23 +246,23 @@ export default function StudentQuiz() {
   if (step === "intro") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="glass-card hover-lift max-w-2xl w-full opacity-0 animate-scale-in">
-          <CardHeader className="text-center pb-4">
-            <div className="flex justify-center mb-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl gradient-primary shadow-lg">
-                <ClipboardList className="h-10 w-10 text-primary-foreground" />
+        <Card className="glass-card hover-lift max-w-3xl w-full opacity-0 animate-scale-in">
+          <CardHeader className="text-center pb-6">
+            <div className="flex justify-center mb-8">
+              <div className="flex h-24 w-24 items-center justify-center rounded-2xl gradient-primary shadow-lg">
+                <ClipboardList className="h-12 w-12 text-primary-foreground" />
               </div>
             </div>
-            <CardTitle className="text-3xl font-bold mb-3">
+            <CardTitle className="text-4xl font-bold mb-4">
               {list.title}
             </CardTitle>
             {list.description && (
-              <CardDescription className="text-base mt-2 max-w-md mx-auto">
+              <CardDescription className="text-lg mt-2 max-w-lg mx-auto">
                 {list.description}
               </CardDescription>
             )}
           </CardHeader>
-          <CardContent className="space-y-6 pt-2">
+          <CardContent className="space-y-8 pt-4">
             {existingSubmission ? (
               <div className="space-y-6">
                 <div className="glass-card rounded-lg p-6 bg-accent/10 border border-accent/20 opacity-0 animate-fade-up text-center">
@@ -291,46 +296,50 @@ export default function StudentQuiz() {
                       })}
                     </p>
                   </div>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link href="/student/dashboard">Back to Dashboard</Link>
+                  <Button
+                    variant="tertiary"
+                    onClick={() => router.push("/student/dashboard")}
+                    className="w-full"
+                  >
+                    Back to Dashboard
                   </Button>
                 </div>
               </div>
             ) : (
               <>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="glass-card rounded-lg p-4 text-center opacity-0 animate-fade-up">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-3">
-                      <FileText className="h-6 w-6 text-primary" />
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div className="glass-card rounded-lg p-6 text-center opacity-0 animate-fade-up">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 mx-auto mb-4">
+                      <FileText className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-2xl font-bold text-foreground">
+                    <p className="text-base font-bold text-foreground">
                       {list.questions.length}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-2">
                       {list.questions.length === 1 ? "Question" : "Questions"}
                     </p>
                   </div>
 
-                  <div className="glass-card rounded-lg p-4 text-center opacity-0 animate-fade-up [animation-delay:150ms]">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 mx-auto mb-3">
-                      <User className="h-6 w-6 text-accent" />
+                  <div className="glass-card rounded-lg p-6 text-center opacity-0 animate-fade-up [animation-delay:150ms]">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-accent/10 mx-auto mb-4">
+                      <User className="h-8 w-8 text-accent" />
                     </div>
-                    <p className="text-sm font-semibold text-foreground truncate">
+                    <p className="text-base font-semibold text-foreground truncate">
                       {list.teacher.name}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-2">
                       Created by
                     </p>
                   </div>
 
-                  <div className="glass-card rounded-lg p-4 text-center opacity-0 animate-fade-up [animation-delay:300ms]">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 mx-auto mb-3">
-                      <Clock className="h-6 w-6 text-success" />
+                  <div className="glass-card rounded-lg p-6 text-center opacity-0 animate-fade-up [animation-delay:300ms]">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-success/10 mx-auto mb-4">
+                      <Clock className="h-8 w-8 text-success" />
                     </div>
-                    <p className="text-sm font-semibold text-foreground">
+                    <p className="text-base font-semibold text-foreground">
                       {Math.ceil(list.questions.length * 1.5)} min
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground mt-2">
                       Est. time
                     </p>
                   </div>
@@ -450,8 +459,12 @@ export default function StudentQuiz() {
               })}
             </div>
 
-            <Button asChild className="w-full" size="lg">
-              <Link href="/">Back to Home</Link>
+            <Button
+              onClick={() => router.push("/student/dashboard")}
+              className="w-full"
+              size="lg"
+            >
+              Go to Dashboard
             </Button>
           </CardContent>
         </Card>
@@ -546,17 +559,8 @@ export default function StudentQuiz() {
 
           {currentQuestionIndex === list.questions.length - 1 ? (
             <Button onClick={handleSubmit} disabled={submitting}>
-              {submitting ? (
-                <>
-                  <LoadingIcon size="sm" className="mr-2" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  Submit Quiz
-                  <Send className="ml-2 h-4 w-4" />
-                </>
-              )}
+              <Send className="mr-2 h-4 w-4" />
+              {submitting ? "Submitting..." : "Submit Quiz"}
             </Button>
           ) : (
             <Button onClick={handleNext}>

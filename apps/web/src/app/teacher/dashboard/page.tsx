@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { ExerciseListCard } from "@/components/ExerciseListCard";
-import { LoadingSpinner } from "@/components/LoadingIcon";
+import { ExerciseListCardSkeletons } from "@/components/ExerciseListCardSkeletons";
 import { EmptyState } from "@/components/EmptyState";
 import { Plus, ClipboardList } from "lucide-react";
 import { ExerciseListWithRelations } from "@/types";
@@ -39,10 +39,6 @@ export default function TeacherDashboard() {
     fetchExerciseLists();
   }, [firebaseUser]);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-8">
@@ -63,7 +59,9 @@ export default function TeacherDashboard() {
           </Link>
         </div>
 
-        {exerciseLists.length === 0 ? (
+        {loading ? (
+          <ExerciseListCardSkeletons count={3} />
+        ) : exerciseLists.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
             title="No exercise lists yet"

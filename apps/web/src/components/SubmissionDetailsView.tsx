@@ -1,105 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { useAuth } from "@/contexts/auth-context";
-import { getAuthInstance } from "@teachy/firebase";
-import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LoadingSpinner } from "@/components/LoadingIcon";
 import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
-import { toast } from "sonner";
 import { QuestionType } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
 import { getResultMessage } from "@/lib/utils/exercise";
 
-export default function SubmissionDetails() {
-  const params = useParams();
-  const router = useRouter();
-  const { firebaseUser, loading: authLoading } = useAuth();
-  const listId = params.listId as string;
-  const submissionId = params.submissionId as string;
+interface SubmissionDetailsViewProps {
+  submission: SubmissionDetail;
+  onBack: () => void;
+  backLabel: string;
+  showResultCard: boolean;
+  answersTitle: string;
+  answerLabel: string;
+  firstCardContent: {
+    icon: typeof User;
+    title: string;
+    subtitle: string;
+  };
+}
 
-  const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSubmission = async () => {
-      if (!firebaseUser || !submissionId) return;
-
-      try {
-        const auth = getAuthInstance();
-        const idToken = await auth.currentUser?.getIdToken();
-
-        if (!idToken) {
-          toast.error("You must be logged in.");
-          router.push("/login");
-          return;
-        }
-
-        const { submission: fetchedSubmission } =
-          await api.exercises.submissions.getById(idToken, submissionId);
-
-        setSubmission(fetchedSubmission);
-      } catch (error) {
-        console.error("Error fetching submission details:", error);
-        toast.error(
-          error instanceof Error
-            ? error.message.endsWith(".")
-              ? error.message
-              : `${error.message}.`
-            : "Failed to load submission details."
-        );
-        router.push(`/teacher/results/${listId}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!authLoading) {
-      fetchSubmission();
-    }
-  }, [firebaseUser, submissionId, listId, router, authLoading]);
-
-  if (loading || authLoading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!submission) {
-    return (
-      <div className="min-h-screen bg-background">
-        <main className="container py-8">
-          <div className="text-center py-16">
-            <h1 className="text-2xl font-bold text-foreground">
-              Submission not found
-            </h1>
-            <Button asChild className="mt-4">
-              <Link href={`/teacher/results/${listId}`}>Back to Results</Link>
-            </Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
+export function SubmissionDetailsView({
+  submission,
+  onBack,
+  backLabel,
+  showResultCard,
+  answersTitle,
+  answerLabel,
+  firstCardContent,
+}: SubmissionDetailsViewProps) {
   const percentage = submission.score;
   const result = getResultMessage(percentage);
   const sortedAnswers = [...submission.answers].sort(
     (a, b) => a.question.order - b.question.order
   );
 
+  const FirstCardIcon = firstCardContent.icon;
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-8">
-        <Link
-          href={`/teacher/results/${listId}`}
-          className="mb-6 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors opacity-0 animate-fade-up"
+        <Button
+          variant="tertiary"
+          onClick={onBack}
+          className="mb-6 opacity-0 animate-fade-up"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Results
-        </Link>
+          {backLabel}
+        </Button>
 
         <div
           className="mb-8 opacity-0 animate-fade-up"
@@ -115,35 +64,37 @@ export default function SubmissionDetails() {
           )}
         </div>
 
-        <Card
-          className="glass-card mb-8 opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.15s" }}
-        >
-          <CardContent className="pt-6 pb-6 text-center">
-            <div className="text-5xl mb-3">{result.emoji}</div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              {result.title}
-            </h2>
-            <p className="text-muted-foreground">{result.message}</p>
-          </CardContent>
-        </Card>
+        {showResultCard && (
+          <Card
+            className="glass-card mb-8 opacity-0 animate-fade-up"
+            style={{ animationDelay: "0.15s" }}
+          >
+            <CardContent className="pt-6 pb-6 text-center">
+              <div className="text-5xl mb-3">{result.emoji}</div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                {result.title}
+              </h2>
+              <p className="text-muted-foreground">{result.message}</p>
+            </CardContent>
+          </Card>
+        )}
 
         <div
           className="grid gap-4 md:grid-cols-3 mb-8 opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.2s" }}
+          style={{ animationDelay: showResultCard ? "0.2s" : "0.15s" }}
         >
           <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <User className="h-5 w-5 text-primary" />
+                  <FirstCardIcon className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {submission.student?.name}
+                  <p className="text-base font-medium text-foreground">
+                    {firstCardContent.title}
                   </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {submission.student?.email}
+                  <p className="text-sm text-muted-foreground truncate">
+                    {firstCardContent.subtitle}
                   </p>
                 </div>
               </div>
@@ -175,7 +126,7 @@ export default function SubmissionDetails() {
                   <Clock className="h-5 w-5 text-accent" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="text-base font-semibold text-foreground">
                     {new Date(submission.createdAt).toLocaleDateString(
                       "en-US",
                       {
@@ -185,7 +136,7 @@ export default function SubmissionDetails() {
                       }
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {new Date(submission.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -199,11 +150,11 @@ export default function SubmissionDetails() {
 
         <Card
           className="glass-card opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.3s" }}
+          style={{ animationDelay: showResultCard ? "0.3s" : "0.2s" }}
         >
           <CardHeader>
             <CardTitle className="text-xl text-foreground">
-              Detailed Answers
+              {answersTitle}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -244,7 +195,7 @@ export default function SubmissionDetails() {
                           {isOpenEnded ? (
                             <div>
                               <p className="text-xs font-medium text-muted-foreground mb-1">
-                                Student&apos;s Answer:
+                                {answerLabel}:
                               </p>
                               <p className="text-sm text-success">
                                 {answer.textAnswer || "No answer provided"}
@@ -254,7 +205,7 @@ export default function SubmissionDetails() {
                             <>
                               <div>
                                 <p className="text-xs font-medium text-muted-foreground mb-1">
-                                  Student&apos;s Answer:
+                                  {answerLabel}:
                                 </p>
                                 <p
                                   className={`text-sm ${

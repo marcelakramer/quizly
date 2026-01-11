@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import { Plus, X, Edit } from "lucide-react";
+import { Plus, Trash2, Check, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { QuestionType } from "@teachy/db";
 import { Question, Option } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select } from "@/components/ui/select";
+import React from "react";
 
 interface QuestionFormProps {
   onAddQuestion: (question: Question) => void;
@@ -30,13 +37,18 @@ export function QuestionForm({
       { label: "", isCorrect: false },
     ]
   );
+  const [correctOptionIndex, setCorrectOptionIndex] = useState<number | null>(
+    initialQuestion?.options?.findIndex((opt) => opt.isCorrect) ?? null
+  );
 
-  // Update form when initialQuestion changes
   useEffect(() => {
     if (initialQuestion) {
       setTitle(initialQuestion.title);
       setQuestionType(initialQuestion.type);
       setOptions(initialQuestion.options);
+      setCorrectOptionIndex(
+        initialQuestion.options?.findIndex((opt) => opt.isCorrect) ?? null
+      );
     } else {
       setTitle("");
       setQuestionType(QuestionType.MULTIPLE_CHOICE);
@@ -44,16 +56,25 @@ export function QuestionForm({
         { label: "", isCorrect: false },
         { label: "", isCorrect: false },
       ]);
+      setCorrectOptionIndex(null);
     }
   }, [initialQuestion]);
 
   const handleAddOption = () => {
-    setOptions([...options, { label: "", isCorrect: false }]);
+    if (options.length < 6) {
+      setOptions([...options, { label: "", isCorrect: false }]);
+    }
   };
 
   const handleRemoveOption = (index: number) => {
     if (options.length > 2) {
-      setOptions(options.filter((_, i) => i !== index));
+      const newOptions = options.filter((_, i) => i !== index);
+      setOptions(newOptions);
+      if (correctOptionIndex === index) {
+        setCorrectOptionIndex(null);
+      } else if (correctOptionIndex !== null && correctOptionIndex > index) {
+        setCorrectOptionIndex(correctOptionIndex - 1);
+      }
     }
   };
 
@@ -63,32 +84,43 @@ export function QuestionForm({
     setOptions(newOptions);
   };
 
-  const handleCorrectChange = (index: number) => {
-    const newOptions = options.map((opt, i) => ({
-      ...opt,
-      isCorrect: i === index,
-    }));
-    setOptions(newOptions);
+  const handleCorrectChange = (index: string) => {
+    const idx = parseInt(index);
+    setCorrectOptionIndex(idx);
   };
+
+  const isValid = React.useMemo(() => {
+    if (!title.trim()) return false;
+
+    if (questionType === QuestionType.MULTIPLE_CHOICE) {
+      if (options.some((opt) => !opt.label.trim())) return false;
+      if (correctOptionIndex === null) return false;
+    }
+
+    return true;
+  }, [title, questionType, options, correctOptionIndex]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim()) {
-      toast.error("Please enter a question title.");
+    if (!isValid) {
+      if (!title.trim()) {
+        toast.error("Please enter a question title.");
+        return;
+      }
+
+      if (questionType === QuestionType.MULTIPLE_CHOICE) {
+        if (options.some((opt) => !opt.label.trim())) {
+          toast.error("Please fill in all options.");
+          return;
+        }
+
+        if (correctOptionIndex === null) {
+          toast.error("Please select a correct answer.");
+          return;
+        }
+      }
       return;
-    }
-
-    if (questionType === QuestionType.MULTIPLE_CHOICE) {
-      if (options.some((opt) => !opt.label.trim())) {
-        toast.error("Please fill in all options.");
-        return;
-      }
-
-      if (!options.some((opt) => opt.isCorrect)) {
-        toast.error("Please select a correct answer.");
-        return;
-      }
     }
 
     const question: Question = {
@@ -97,9 +129,9 @@ export function QuestionForm({
       type: questionType,
       options:
         questionType === QuestionType.MULTIPLE_CHOICE
-          ? options.map((opt) => ({
+          ? options.map((opt, index) => ({
               label: opt.label.trim(),
-              isCorrect: opt.isCorrect,
+              isCorrect: index === correctOptionIndex,
             }))
           : [],
       order: initialQuestion?.order || 0,
@@ -118,129 +150,154 @@ export function QuestionForm({
         { label: "", isCorrect: false },
         { label: "", isCorrect: false },
       ]);
+      setCorrectOptionIndex(null);
     }
   };
 
   return (
-    <div className="glass-card rounded-lg p-6">
-      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        {isEditing ? (
-          <>
-            <Edit className="h-5 w-5 text-primary" />
-            Edit Question
-          </>
-        ) : (
-          <>
-            <Plus className="h-5 w-5 text-primary" />
-            Add Question
-          </>
-        )}
-      </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="question-type" className="block text-sm font-medium">
-            Question Type
-          </label>
-          <select
-            id="question-type"
-            value={questionType}
-            onChange={(e) => {
-              setQuestionType(e.target.value as QuestionType);
-              if (e.target.value === QuestionType.OPEN_ENDED) {
-                setOptions([]);
-              } else if (options.length === 0) {
-                setOptions([
-                  { label: "", isCorrect: false },
-                  { label: "", isCorrect: false },
-                ]);
-              }
-            }}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value={QuestionType.MULTIPLE_CHOICE}>
-              Multiple Choice
-            </option>
-            <option value={QuestionType.OPEN_ENDED}>Open-ended</option>
-          </select>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="question-title" className="block text-sm font-medium">
-            Question
-          </label>
-          <input
-            id="question-title"
-            type="text"
-            placeholder="Enter your question..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-
-        {questionType === QuestionType.MULTIPLE_CHOICE && (
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Options</label>
-            <div className="space-y-2">
-              {options.map((option, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="correct-option"
-                    checked={option.isCorrect}
-                    onChange={() => handleCorrectChange(index)}
-                    className="h-4 w-4 text-primary focus:ring-primary"
-                  />
-                  <input
-                    type="text"
-                    placeholder={`Option ${index + 1}`}
-                    value={option.label}
-                    onChange={(e) => handleOptionChange(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {options.length > 2 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveOption(index)}
-                      className="p-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={handleAddOption}
-              className="text-sm text-primary hover:text-primary/80 flex items-center gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              Add Option
-            </button>
-          </div>
-        )}
-
-        <div className="flex gap-2">
-          {isEditing && onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 border border-border hover:bg-muted px-4 py-2 rounded-lg font-medium transition-colors"
-            >
-              Cancel
-            </button>
+    <Card className="glass-card">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          {isEditing ? (
+            <>
+              <Edit className="h-5 w-5 text-primary" />
+              Edit Question
+            </>
+          ) : (
+            <>
+              <Plus className="h-5 w-5 text-primary" />
+              Add Question
+            </>
           )}
-          <button
-            type="submit"
-            className={`${
-              isEditing ? "flex-1" : "w-full"
-            } bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors`}
-          >
-            {isEditing ? "Update Question" : "Add Question"}
-          </button>
-        </div>
-      </form>
-    </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="question-type">Question Type</Label>
+            <Select
+              value={questionType}
+              onValueChange={(value) => {
+                setQuestionType(value as QuestionType);
+                if (value === QuestionType.OPEN_ENDED) {
+                  setOptions([]);
+                  setCorrectOptionIndex(null);
+                } else if (options.length === 0) {
+                  setOptions([
+                    { label: "", isCorrect: false },
+                    { label: "", isCorrect: false },
+                  ]);
+                }
+              }}
+              options={[
+                {
+                  value: QuestionType.MULTIPLE_CHOICE,
+                  label: "Multiple Choice",
+                },
+                { value: QuestionType.OPEN_ENDED, label: "Open-ended" },
+              ]}
+              placeholder="Select question type"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="question-title">Question Text</Label>
+            <Input
+              id="question-title"
+              type="text"
+              placeholder="Enter your question..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+
+          {questionType === QuestionType.MULTIPLE_CHOICE && (
+            <div className="space-y-3">
+              <Label>Answer Options (select the correct one)</Label>
+              <RadioGroup
+                value={
+                  correctOptionIndex !== null
+                    ? correctOptionIndex.toString()
+                    : ""
+                }
+                onValueChange={handleCorrectChange}
+              >
+                {options.map((option, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <RadioGroupItem
+                      value={index.toString()}
+                      id={`option-${index}`}
+                    />
+                    <Input
+                      placeholder={`Option ${index + 1}`}
+                      value={option.label}
+                      onChange={(e) =>
+                        handleOptionChange(index, e.target.value)
+                      }
+                      className="flex-1"
+                    />
+                    {options.length > 2 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveOption(index)}
+                        className="h-10 w-10 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-6 w-6" />
+                      </Button>
+                    )}
+                    {correctOptionIndex === index && (
+                      <Check className="h-6 w-6 text-success" />
+                    )}
+                  </div>
+                ))}
+              </RadioGroup>
+              {options.length < 6 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddOption}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Option
+                </Button>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            {isEditing && onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            )}
+            <Button
+              type="submit"
+              disabled={!isValid}
+              className={isEditing ? "flex-1" : "w-full"}
+            >
+              {isEditing ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Update Question
+                </>
+              ) : (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Add Question
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

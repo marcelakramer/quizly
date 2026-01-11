@@ -144,8 +144,18 @@ export default function RegisterPage() {
                       : "border-muted bg-background hover:bg-accent hover:text-white"
                   }`}
                 >
-                  <GraduationCap className="h-6 w-6 mb-2" />
-                  <span className="text-sm font-medium">Student</span>
+                  <GraduationCap
+                    className={`h-6 w-6 mb-2 ${
+                      role === UserRole.STUDENT ? "text-primary" : ""
+                    }`}
+                  />
+                  <span
+                    className={`text-sm font-medium ${
+                      role === UserRole.STUDENT ? "text-primary" : ""
+                    }`}
+                  >
+                    Student
+                  </span>
                 </Label>
               </div>
               <div className="relative flex">
@@ -162,8 +172,18 @@ export default function RegisterPage() {
                       : "border-muted bg-background hover:bg-accent hover:text-white"
                   }`}
                 >
-                  <User className="h-6 w-6 mb-2" />
-                  <span className="text-sm font-medium">Teacher</span>
+                  <User
+                    className={`h-6 w-6 mb-2 ${
+                      role === UserRole.TEACHER ? "text-primary" : ""
+                    }`}
+                  />
+                  <span
+                    className={`text-sm font-medium ${
+                      role === UserRole.TEACHER ? "text-primary" : ""
+                    }`}
+                  >
+                    Teacher
+                  </span>
                 </Label>
               </div>
             </RadioGroup>
@@ -226,15 +246,9 @@ export default function RegisterPage() {
           </span>
           <Link
             href="/login"
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
+            className="text-primary hover:text-primary/80 font-medium transition-colors ml-1"
           >
             Sign in here
-          </Link>
-        </div>
-
-        <div className="text-center text-xs text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            ← Back to home
           </Link>
         </div>
       </div>

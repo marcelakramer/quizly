@@ -8,7 +8,7 @@ import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LoadingSpinner } from "@/components/LoadingIcon";
+import { ResultsSkeleton } from "@/components/ResultsSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { ArrowLeft, Users, Trophy, Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -62,7 +62,7 @@ export default function ViewResults() {
   }, [firebaseUser, listId, router]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <ResultsSkeleton />;
   }
 
   if (!list) {
@@ -73,8 +73,12 @@ export default function ViewResults() {
             <h1 className="text-2xl font-bold text-foreground">
               List not found
             </h1>
-            <Button asChild className="mt-4">
-              <Link href="/teacher/dashboard">Back to Dashboard</Link>
+            <Button
+              variant="tertiary"
+              onClick={() => router.push("/teacher/dashboard")}
+              className="mt-4"
+            >
+              Back to Dashboard
             </Button>
           </div>
         </main>
@@ -104,13 +108,14 @@ export default function ViewResults() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-8">
-        <Link
-          href="/teacher/dashboard"
-          className="mb-6 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors opacity-0 animate-fade-up"
+        <Button
+          variant="tertiary"
+          onClick={() => router.push("/teacher/dashboard")}
+          className="mb-6 opacity-0 animate-fade-up"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
-        </Link>
+        </Button>
 
         <div
           className="mb-8 flex items-start justify-between opacity-0 animate-fade-up"
@@ -196,7 +201,6 @@ export default function ViewResults() {
                 icon={Users}
                 title="No submissions yet"
                 description="Share the quiz link with your students to start receiving responses"
-                className="py-8"
               />
             ) : (
               <div className="space-y-3">
@@ -205,16 +209,16 @@ export default function ViewResults() {
                   return (
                     <Link
                       key={submission.id}
-                      href={`/teacher/results/${listId}/submissions/${submission.id}`}
+                      href={`/results/${submission.id}`}
                       className="flex items-center justify-between rounded-lg border border-border/50 p-4 opacity-0 animate-fade-up hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer"
-                      style={{ animationDelay: `${0.4 + index * 0.05}s` }}
+                      style={{ animationDelay: `${0.4 + index * 0.1}s` }}
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
                           {submission.studentName.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">
+                          <p className="font-medium">
                             {submission.studentName}
                           </p>
                           <p className="text-sm text-muted-foreground">

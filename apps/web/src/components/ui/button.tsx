@@ -3,7 +3,13 @@ import Link from "next/link";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "default" | "outline" | "ghost" | "destructive";
+  variant?:
+    | "default"
+    | "secondary"
+    | "outline"
+    | "ghost"
+    | "destructive"
+    | "tertiary";
   size?: "sm" | "md" | "lg";
   asChild?: boolean;
 }
@@ -25,11 +31,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      secondary: "bg-accent text-accent-foreground hover:bg-accent/90",
       outline:
         "border border-border bg-background hover:bg-accent hover:text-accent-foreground",
       ghost: "hover:bg-accent hover:text-accent-foreground",
       destructive:
         "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      tertiary: "text-muted-foreground hover:text-foreground hover:bg-muted/50",
     };
 
     const sizeClasses = {

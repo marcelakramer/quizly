@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ClipboardList, Users, CheckCircle } from "lucide-react";
+import { ClipboardList, Users, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRole } from "@teachy/db";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const { firebaseUser, dbUser } = useAuth();
@@ -18,7 +19,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28">
         <div className="mx-auto max-w-3xl text-center opacity-0 animate-fade-up">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
             Create engaging
@@ -30,29 +31,21 @@ export default function Home() {
             Build interactive quizzes, share them with a simple link, and track
             your students&apos; progress—all in one place.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-2">
             {firebaseUser && dbUser ? (
-              <Link
-                href={getDashboardUrl()}
-                className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all border-2 border-transparent"
-              >
-                Go to Dashboard
-              </Link>
+              <Button asChild size="lg">
+                <Link href={getDashboardUrl()}>
+                  Go to Dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             ) : (
-              <>
-                <Link
-                  href="/register"
-                  className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all border-2 border-transparent"
-                >
+              <Button asChild size="lg">
+                <Link href="/register">
                   Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center bg-background hover:bg-muted text-primary border-2 border-primary px-8 py-3 rounded-lg font-medium text-lg shadow-md hover:shadow-lg transition-all"
-                >
-                  Sign In
-                </Link>
-              </>
+              </Button>
             )}
           </div>
         </div>

@@ -1,41 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Save, FileText, Trash2 } from "lucide-react";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { QuestionForm } from "@/components/QuestionForm";
-import { QuestionPreview } from "@/components/QuestionPreview";
-import { EmptyState } from "@/components/EmptyState";
+import { useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { LoadingSpinner } from "@/components/LoadingIcon";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { ExerciseListForm } from "@/components/ExerciseListForm";
+import { ExerciseListFormSkeleton } from "@/components/ExerciseListFormSkeleton";
 import { Question } from "@/types";
 
 export default function EditList() {
@@ -43,389 +15,59 @@ export default function EditList() {
   const params = useParams();
   const listId = params.listId as string;
   const { firebaseUser } = useAuth();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
-    null
-  );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  useEffect(() => {
-    const fetchList = async () => {
-      if (!firebaseUser || !listId) return;
-
-      try {
-        const auth = getAuthInstance();
-        const idToken = await auth.currentUser?.getIdToken();
-
-        if (!idToken) {
-          toast.error("You must be logged in.");
-          router.push("/login");
-          return;
-        }
-
-        const { list } = await api.exercises.lists.getById(idToken, listId);
-
-        if (list.submissions.length > 0) {
-          toast.error("Cannot edit exercise list that has submissions.");
-          router.push("/teacher/dashboard");
-          return;
-        }
-
-        setTitle(list.title);
-        setDescription(list.description || "");
-        setQuestions(
-          list.questions.map((q) => ({
-            id: q.id,
-            title: q.title,
-            type: q.type,
-            options: q.options.map((opt) => ({
-              label: opt.label,
-              isCorrect: opt.isCorrect,
-            })),
-            order: q.order,
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching exercise list:", error);
-        toast.error(
-          error instanceof Error
-            ? error.message.endsWith(".")
-              ? error.message
-              : `${error.message}.`
-            : "Failed to load exercise list."
-        );
-        router.push("/teacher/dashboard");
-      } finally {
-        setLoadingData(false);
-      }
-    };
-
-    if (firebaseUser) {
-      fetchList();
+  const loadData = useCallback(async () => {
+    if (!firebaseUser || !listId) {
+      throw new Error("Missing required data");
     }
+
+    const auth = getAuthInstance();
+    const idToken = await auth.currentUser?.getIdToken();
+
+    if (!idToken) {
+      toast.error("You must be logged in.");
+      router.push("/login");
+      throw new Error("Not authenticated");
+    }
+
+    const { list } = await api.exercises.lists.getById(idToken, listId);
+
+    if (list.submissions.length > 0) {
+      toast.error("Cannot edit exercise list that has submissions.");
+      router.push("/teacher/dashboard");
+      throw new Error("List has submissions");
+    }
+
+    return {
+      title: list.title,
+      description: list.description || "",
+      questions: list.questions.map((q) => ({
+        id: q.id,
+        title: q.title,
+        type: q.type,
+        options: q.options.map((opt) => ({
+          label: opt.label,
+          isCorrect: opt.isCorrect,
+        })),
+        order: q.order,
+      })) as Question[],
+    };
   }, [firebaseUser, listId, router]);
 
-  const handleAddQuestion = (question: Question) => {
-    const questionWithOrder = {
-      ...question,
-      order: questions.length,
-    };
-    setQuestions([...questions, questionWithOrder]);
-  };
-
-  const handleRemoveQuestion = (id: string) => {
-    const newQuestions = questions
-      .filter((q) => q.id !== id)
-      .map((q, index) => ({ ...q, order: index }));
-    setQuestions(newQuestions);
-    if (editingQuestionId === id) {
-      setEditingQuestionId(null);
-    }
-  };
-
-  const handleEditQuestion = (id: string) => {
-    setEditingQuestionId(id);
-  };
-
-  const handleUpdateQuestion = (updatedQuestion: Question) => {
-    setQuestions((prev) =>
-      prev.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
+  if (!firebaseUser) {
+    return (
+      <div className="min-h-screen bg-background">
+        <main className="container py-8">
+          <ExerciseListFormSkeleton showDeleteButton={true} />
+        </main>
+      </div>
     );
-    setEditingQuestionId(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingQuestionId(null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setQuestions((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        const newItems = arrayMove(items, oldIndex, newIndex);
-        return newItems.map((item, index) => ({
-          ...item,
-          order: index,
-        }));
-      });
-    }
-  };
-
-  const handleSave = async () => {
-    if (!title.trim()) {
-      toast.error("Please enter a title.");
-      return;
-    }
-    if (questions.length === 0) {
-      toast.error("Please add at least one question.");
-      return;
-    }
-
-    if (!firebaseUser) {
-      toast.error("You must be logged in to update an exercise list.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const auth = getAuthInstance();
-      const idToken = await auth.currentUser?.getIdToken();
-
-      if (!idToken) {
-        throw new Error("Not authenticated");
-      }
-
-      await api.exercises.lists.update(idToken, listId, {
-        title: title.trim(),
-        description: description.trim() || null,
-        questions: questions.map((q) => ({
-          title: q.title,
-          type: q.type,
-          options: q.options,
-          order: q.order,
-        })),
-      });
-
-      toast.success("Exercise list updated successfully!");
-      router.push("/teacher/dashboard");
-    } catch (error) {
-      console.error("Error updating exercise list:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message.endsWith(".")
-            ? error.message
-            : `${error.message}.`
-          : "Failed to update exercise list."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!firebaseUser) {
-      toast.error("You must be logged in to delete an exercise list.");
-      return;
-    }
-
-    setDeleting(true);
-
-    try {
-      const auth = getAuthInstance();
-      const idToken = await auth.currentUser?.getIdToken();
-
-      if (!idToken) {
-        throw new Error("Not authenticated");
-      }
-
-      await api.exercises.lists.delete(idToken, listId);
-
-      toast.success("Exercise list deleted successfully!");
-      router.push("/teacher/dashboard");
-    } catch (error) {
-      console.error("Error deleting exercise list:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message.endsWith(".")
-            ? error.message
-            : `${error.message}.`
-          : "Failed to delete exercise list."
-      );
-    } finally {
-      setDeleting(false);
-      setShowDeleteDialog(false);
-    }
-  };
-
-  if (loadingData) {
-    return <LoadingSpinner />;
   }
 
   return (
     <div className="min-h-screen bg-background">
       <main className="container py-8">
-        <Link
-          href="/teacher/dashboard"
-          className="mb-6 inline-flex items-center text-muted-foreground hover:text-foreground transition-colors opacity-0 animate-fade-up"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Link>
-
-        <div
-          className="mb-8 flex items-start justify-between opacity-0 animate-fade-up"
-          style={{ animationDelay: "0.1s" }}
-        >
-          <div>
-            <h1 className="text-3xl font-bold">Edit Exercise List</h1>
-            <p className="mt-1 text-muted-foreground">
-              Update questions and details for your assessment
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div
-            className="space-y-6 opacity-0 animate-fade-up"
-            style={{ animationDelay: "0.2s" }}
-          >
-            <div className="glass-card rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                List Details
-              </h3>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label htmlFor="title" className="block text-sm font-medium">
-                    Title
-                  </label>
-                  <input
-                    id="title"
-                    type="text"
-                    placeholder="e.g., Introduction to Fractions"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium"
-                  >
-                    Description (optional)
-                  </label>
-                  <textarea
-                    id="description"
-                    placeholder="Describe this exercise list..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <QuestionForm
-              onAddQuestion={handleAddQuestion}
-              initialQuestion={
-                editingQuestionId
-                  ? questions.find((q) => q.id === editingQuestionId) || null
-                  : null
-              }
-              onUpdateQuestion={handleUpdateQuestion}
-              onCancel={handleCancelEdit}
-            />
-          </div>
-
-          <div
-            className="space-y-6 opacity-0 animate-fade-up"
-            style={{ animationDelay: "0.3s" }}
-          >
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">
-                Questions ({questions.length})
-              </h2>
-              <button
-                onClick={handleSave}
-                disabled={!title.trim() || questions.length === 0 || loading}
-                className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {loading ? "Saving..." : "Update List"}
-              </button>
-            </div>
-
-            {questions.length === 0 ? (
-              <div className="glass-card rounded-lg p-6">
-                <EmptyState
-                  icon={FileText}
-                  title="No questions yet"
-                  description="Add your first question using the form."
-                  className="py-12"
-                />
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={questions.map((q) => q.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-4">
-                    {questions.map((question, index) => (
-                      <QuestionPreview
-                        key={question.id}
-                        question={question}
-                        index={index}
-                        onRemove={handleRemoveQuestion}
-                        onEdit={handleEditQuestion}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            )}
-          </div>
-        </div>
-
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Exercise List</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete &quot;{title}&quot;? This action
-                cannot be undone and will permanently delete all questions and
-                any associated data.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteDialog(false)}
-                disabled={deleting}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={deleting}
-              >
-                {deleting ? "Deleting..." : "Delete"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <ExerciseListForm mode="edit" listId={listId} onLoadData={loadData} />
       </main>
     </div>
   );

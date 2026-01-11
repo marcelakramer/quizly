@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/auth-context";
 import { getAuthInstance } from "@teachy/firebase";
-import { LoadingSpinner } from "@/components/LoadingIcon";
+import { StudentDashboardSkeleton } from "@/components/StudentDashboardSkeleton";
 import { EmptyState } from "@/components/EmptyState";
 
 import { StudentSubmission } from "@/types";
@@ -79,13 +79,11 @@ export default function StudentDashboard() {
     setLoading(true);
 
     try {
-      // Validate the share code by trying to fetch the quiz
       await api.quiz.getByShareCode(shareCode.trim().toUpperCase());
-
-      // If successful, redirect to the quiz
       router.push(`/quiz/${shareCode.trim().toUpperCase()}`);
     } catch (error) {
       console.error("Error validating quiz code:", error);
+      setShareCode("");
       toast.error(
         error instanceof Error
           ? error.message.endsWith(".")
@@ -99,10 +97,9 @@ export default function StudentDashboard() {
   };
 
   if (authLoading || loadingSubmissions) {
-    return <LoadingSpinner />;
+    return <StudentDashboardSkeleton />;
   }
 
-  // Calculate performance statistics
   const totalQuizzes = submissions.length;
   const averageScore =
     submissions.length > 0
@@ -333,7 +330,7 @@ export default function StudentDashboard() {
                     return (
                       <Link
                         key={submission.id}
-                        href={`/student/results/${submission.exerciseList.shareCode}`}
+                        href={`/results/${submission.id}`}
                         className="block rounded-lg border border-border/50 p-4 hover:border-primary/50 hover:bg-primary/5 transition-all opacity-0 animate-fade-up"
                         style={{ animationDelay: `${0.4 + index * 0.05}s` }}
                       >

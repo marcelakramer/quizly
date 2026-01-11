@@ -9,6 +9,8 @@ import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { getInitials } from "@/lib/utils/user";
 import { Logo } from "./Logo";
+import { Button } from "@/components/ui/button";
+import { LogIn } from "lucide-react";
 
 const publicRoutes = ["/login", "/register"];
 const publicRoutePrefixes = ["/quiz"];
@@ -97,7 +99,14 @@ export function Header() {
               </div>
             )}
           </div>
-        ) : null}
+        ) : (
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/login">
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In
+            </Link>
+          </Button>
+        )}
       </div>
     </header>
   );
