@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { getDashboardPathForRole } from "@/lib/utils/role";
+import { getAuthErrorMessage } from "@/lib/utils/auth";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Logo } from "@/components/Logo";
@@ -55,13 +56,9 @@ export default function LoginPage() {
 
       router.push(getDashboardPathForRole(dbUser.role));
     } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message.endsWith(".")
-            ? err.message
-            : `${err.message}.`
-          : "Failed to sign in.";
-      toast.error(errorMessage);
+      toast.error(
+        getAuthErrorMessage(err, "Failed to sign in. Please try again.")
+      );
     } finally {
       setLoading(false);
     }

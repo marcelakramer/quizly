@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UserRole } from "@teachy/db";
 import { getDashboardPathForRole } from "@/lib/utils/role";
+import { getAuthErrorMessage } from "@/lib/utils/auth";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
@@ -81,13 +82,9 @@ export default function RegisterPage() {
 
       router.replace(getDashboardPathForRole(role));
     } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message.endsWith(".")
-            ? err.message
-            : `${err.message}.`
-          : "Failed to create account.";
-      toast.error(errorMessage);
+      toast.error(
+        getAuthErrorMessage(err, "Failed to create account. Please try again.")
+      );
     } finally {
       setLoading(false);
     }
