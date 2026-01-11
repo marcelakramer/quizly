@@ -92,7 +92,12 @@ export function ExerciseListForm({
           const data = await onLoadData();
           setTitle(data.title);
           setDescription(data.description || "");
-          setQuestions(data.questions);
+          setQuestions(
+            data.questions.map((q, idx) => ({
+              ...q,
+              order: typeof q.order === "number" ? q.order : idx,
+            }))
+          );
         } catch (error) {
           console.error("Error fetching exercise list:", error);
           toast.error(
@@ -117,16 +122,22 @@ export function ExerciseListForm({
   }
 
   const handleAddQuestion = (question: Question) => {
-    const questionWithOrder = {
+    const id = question.id ?? crypto.randomUUID();
+
+    const questionWithOrder: Question = {
       ...question,
+      id,
       order: questions.length,
     };
-    setQuestions([...questions, questionWithOrder]);
-    setNewQuestionIds((prev) => new Set(prev).add(question.id));
+
+    setQuestions((prev) => [...prev, questionWithOrder]);
+
+    setNewQuestionIds((prev) => new Set(prev).add(id));
+
     setTimeout(() => {
       setNewQuestionIds((prev) => {
         const next = new Set(prev);
-        next.delete(question.id);
+        next.delete(id);
         return next;
       });
     }, 500);
@@ -202,6 +213,7 @@ export function ExerciseListForm({
       }
 
       const questionsData = questions.map((q) => ({
+        id: q.id,
         title: q.title,
         type: q.type,
         options: q.options,
@@ -406,18 +418,20 @@ export function ExerciseListForm({
               modifiers={[restrictToVerticalAxis, restrictToParentElement]}
             >
               <SortableContext
-                items={questions.map((q) => q.id)}
+                items={questions.map((q) => q.id ?? String(q.order))}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="flex flex-col gap-4">
                   {questions.map((question, index) => (
                     <QuestionPreview
-                      key={question.id}
+                      key={question.id ?? index}
                       question={question}
                       index={index}
                       onRemove={handleRemoveQuestion}
                       onEdit={handleEditQuestion}
-                      isNew={newQuestionIds.has(question.id)}
+                      isNew={
+                        question.id ? newQuestionIds.has(question.id) : false
+                      }
                     />
                   ))}
                 </div>

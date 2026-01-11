@@ -62,7 +62,7 @@ const QuestionContent = memo(function QuestionContent({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onEdit(question.id)}
+            onClick={() => question.id && onEdit(question.id)}
             className="h-10 w-10 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10"
           >
             <Edit className="h-6 w-6" />
@@ -71,7 +71,7 @@ const QuestionContent = memo(function QuestionContent({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onRemove(question.id)}
+          onClick={() => question.id && onRemove(question.id)}
           className="h-10 w-10 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
         >
           <Trash2 className="h-6 w-6" />
@@ -96,7 +96,7 @@ export function QuestionPreview({
     transition,
     isDragging,
   } = useSortable({
-    id: question.id,
+    id: question.id ?? String(index),
     transition: {
       duration: 300,
       easing: "cubic-bezier(0.25, 1, 0.5, 1)",

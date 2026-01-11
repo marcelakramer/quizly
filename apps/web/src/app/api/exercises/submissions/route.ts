@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, QuestionType } from "@teachy/db";
 import { z } from "zod";
-import { requireStudent } from "@/lib/api/auth";
+import { requireStudent } from "@/lib/api/server";
 import { handleApiError, notFound } from "@/lib/api/server/errors";
 
 const submitSchema = z.object({

@@ -22,13 +22,14 @@ export function useQuizValidation(
     const missing: string[] = [];
 
     for (const q of questions) {
+      const qid = q.id ?? "";
       if (q.type === QuestionType.OPEN_ENDED) {
-        if (!textAnswers[q.id] || !textAnswers[q.id].trim()) {
-          missing.push(q.id);
+        if (!textAnswers[qid] || !textAnswers[qid].trim()) {
+          missing.push(qid);
         }
       } else {
-        if (!answers[q.id]) {
-          missing.push(q.id);
+        if (!answers[qid]) {
+          missing.push(qid);
         }
       }
     }

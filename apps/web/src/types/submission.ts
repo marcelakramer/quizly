@@ -1,4 +1,18 @@
-import { QuestionType } from "@teachy/db";
+import { Question, Option } from "./question";
+import { ExerciseListDetail } from "./exercise";
+
+export interface AnswerBase {
+  questionId: string;
+  selectedOptionId?: string;
+  textAnswer?: string;
+  isCorrect?: boolean;
+  correctOptionId?: string;
+}
+
+export interface AnswerDetail extends AnswerBase {
+  question: Question;
+  selectedOption?: Option;
+}
 
 export interface SubmissionDetail {
   id: string;
@@ -11,51 +25,8 @@ export interface SubmissionDetail {
     name: string;
     email: string;
   };
-  exerciseList: {
-    id: string;
-    title: string;
-    description: string | null;
-    shareCode: string;
-    questions: Array<{
-      id: string;
-      title: string;
-      type: QuestionType;
-      order: number;
-      options: Array<{
-        id: string;
-        label: string;
-        isCorrect: boolean;
-      }>;
-    }>;
-    teacher?: {
-      id: string;
-      name: string;
-      email: string;
-    };
-  };
-  answers: Array<{
-    questionId: string;
-    question: {
-      id: string;
-      title: string;
-      type: QuestionType;
-      order: number;
-      options: Array<{
-        id: string;
-        label: string;
-        isCorrect: boolean;
-      }>;
-    };
-    selectedOptionId?: string;
-    selectedOption?: {
-      id: string;
-      label: string;
-      isCorrect: boolean;
-    };
-    textAnswer?: string;
-    isCorrect?: boolean;
-    correctOptionId?: string;
-  }>;
+  exerciseList: ExerciseListDetail;
+  answers: AnswerDetail[];
 }
 
 export interface SubmissionResult {
@@ -64,13 +35,7 @@ export interface SubmissionResult {
   totalQuestions: number;
   correctAnswers: number;
   createdAt?: Date;
-  answers: Array<{
-    questionId: string;
-    selectedOptionId?: string;
-    textAnswer?: string;
-    isCorrect?: boolean;
-    correctOptionId?: string;
-  }>;
+  answers: AnswerBase[];
 }
 
 export interface StudentSubmission {
@@ -101,4 +66,9 @@ export interface Submission {
   totalQuestions: number;
   percentage: number;
   submittedAt: Date;
+}
+
+export interface SubmissionCheck {
+  hasSubmission: boolean;
+  submission?: SubmissionResult;
 }

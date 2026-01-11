@@ -1,4 +1,14 @@
 import { User, UserRole } from "@teachy/db";
+import {
+  ExerciseListWithRelations,
+  ExerciseListSummary,
+  SubmissionDetail,
+  SubmissionCheck,
+  SubmissionResult,
+  StudentSubmission,
+  Submission,
+  QuizList,
+} from "@/types";
 
 interface ApiError {
   error: string;
@@ -58,52 +68,76 @@ export const api = {
       });
     },
   },
-  user: {},
   exercises: {
     lists: {
-      getAll: async (idToken: string) => {
-        return fetchWithAuth<any>("/api/exercises/lists", idToken, {
-          method: "GET",
-        });
+      getAll: async (
+        idToken: string
+      ): Promise<{ lists: ExerciseListWithRelations[] }> => {
+        return fetchWithAuth<{ lists: ExerciseListWithRelations[] }>(
+          "/api/exercises/lists",
+          idToken,
+          { method: "GET" }
+        );
       },
-      create: async (idToken: string, data: any) => {
-        return fetchWithAuth<any>("/api/exercises/lists", idToken, {
-          method: "POST",
-          body: JSON.stringify(data),
-        });
+      create: async (
+        idToken: string,
+        data: Partial<ExerciseListWithRelations>
+      ): Promise<{ list: ExerciseListWithRelations }> => {
+        return fetchWithAuth<{ list: ExerciseListWithRelations }>(
+          "/api/exercises/lists",
+          idToken,
+          { method: "POST", body: JSON.stringify(data) }
+        );
       },
-      getById: async (idToken: string, listId: string) => {
-        return fetchWithAuth<any>(
+      getById: async (
+        idToken: string,
+        listId: string
+      ): Promise<{ list: ExerciseListWithRelations }> => {
+        return fetchWithAuth<{ list: ExerciseListWithRelations }>(
           `/api/exercises/lists/manage/${listId}`,
           idToken,
           { method: "GET" }
         );
       },
-      update: async (idToken: string, listId: string, data: any) => {
-        return fetchWithAuth<any>(
+      update: async (
+        idToken: string,
+        listId: string,
+        data: Partial<ExerciseListWithRelations>
+      ): Promise<{ list: ExerciseListWithRelations }> => {
+        return fetchWithAuth<{ list: ExerciseListWithRelations }>(
           `/api/exercises/lists/manage/${listId}`,
           idToken,
           { method: "PUT", body: JSON.stringify(data) }
         );
       },
-      delete: async (idToken: string, listId: string) => {
-        return fetchWithAuth<any>(
+      delete: async (
+        idToken: string,
+        listId: string
+      ): Promise<{ success: boolean }> => {
+        return fetchWithAuth<{ success: boolean }>(
           `/api/exercises/lists/manage/${listId}`,
           idToken,
           { method: "DELETE" }
         );
       },
-      getSubmissions: async (idToken: string, listId: string) => {
-        return fetchWithAuth<any>(
-          `/api/exercises/submissions/lists/${listId}`,
-          idToken,
-          { method: "GET" }
-        );
+      getSubmissions: async (
+        idToken: string,
+        listId: string
+      ): Promise<{ list: ExerciseListSummary; submissions: Submission[] }> => {
+        return fetchWithAuth<{
+          list: ExerciseListSummary;
+          submissions: Submission[];
+        }>(`/api/exercises/submissions/lists/${listId}`, idToken, {
+          method: "GET",
+        });
       },
     },
     submissions: {
-      getById: async (idToken: string, submissionId: string) => {
-        return fetchWithAuth<any>(
+      getById: async (
+        idToken: string,
+        submissionId: string
+      ): Promise<{ submission: SubmissionDetail }> => {
+        return fetchWithAuth<{ submission: SubmissionDetail }>(
           `/api/exercises/submissions/${submissionId}`,
           idToken,
           { method: "GET" }
@@ -111,8 +145,10 @@ export const api = {
       },
     },
     student: {
-      getAll: async (idToken: string) => {
-        return fetchWithAuth<any>(
+      getAll: async (
+        idToken: string
+      ): Promise<{ submissions: StudentSubmission[] }> => {
+        return fetchWithAuth<{ submissions: StudentSubmission[] }>(
           "/api/exercises/submissions/student",
           idToken,
           { method: "GET" }
@@ -121,20 +157,30 @@ export const api = {
     },
   },
   quiz: {
-    getByShareCode: async (shareCode: string) => {
-      return fetchApi<any>(`/api/exercises/lists/${shareCode}`, {
+    getByShareCode: async (shareCode: string): Promise<{ list: QuizList }> => {
+      return fetchApi<{ list: QuizList }>(`/api/exercises/lists/${shareCode}`, {
         method: "GET",
       });
     },
-    submit: async (idToken: string, shareCode: string, answers: any[]) => {
-      return fetchApi<any>("/api/exercises/submissions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${idToken}` },
-        body: JSON.stringify({ shareCode, answers }),
-      });
+    submit: async (
+      idToken: string,
+      shareCode: string,
+      answers: SubmissionResult["answers"]
+    ): Promise<{ submission: SubmissionResult }> => {
+      return fetchWithAuth<{ submission: SubmissionResult }>(
+        "/api/exercises/submissions",
+        idToken,
+        {
+          method: "POST",
+          body: JSON.stringify({ shareCode, answers }),
+        }
+      );
     },
-    checkSubmission: async (idToken: string, shareCode: string) => {
-      return fetchWithAuth<any>(
+    checkSubmission: async (
+      idToken: string,
+      shareCode: string
+    ): Promise<SubmissionCheck> => {
+      return fetchWithAuth<SubmissionCheck>(
         `/api/exercises/submissions/check/${shareCode}`,
         idToken,
         { method: "GET" }

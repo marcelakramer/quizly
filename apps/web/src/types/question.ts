@@ -1,12 +1,13 @@
 import { QuestionType } from "@teachy/db";
 
 export interface Option {
+  id?: string;
   label: string;
   isCorrect: boolean;
 }
 
 export interface Question {
-  id: string;
+  id?: string;
   title: string;
   type: QuestionType;
   options: Option[];

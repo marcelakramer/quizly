@@ -121,7 +121,7 @@ export function useQuiz(shareCode: string) {
     (optionId: string) => {
       if (!list) return;
       const currentQuestion = list.questions[currentQuestionIndex];
-      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+      setAnswers((prev) => ({ ...prev, [currentQuestion.id ?? ""]: optionId }));
     },
     [list, currentQuestionIndex]
   );
@@ -130,7 +130,7 @@ export function useQuiz(shareCode: string) {
     (text: string) => {
       if (!list) return;
       const currentQuestion = list.questions[currentQuestionIndex];
-      setTextAnswers((prev) => ({ ...prev, [currentQuestion.id]: text }));
+      setTextAnswers((prev) => ({ ...prev, [currentQuestion.id ?? ""]: text }));
     },
     [list, currentQuestionIndex]
   );
@@ -138,10 +138,9 @@ export function useQuiz(shareCode: string) {
   const handleNext = useCallback(() => {
     if (!list) return;
     const currentQuestion = list.questions[currentQuestionIndex];
+    const qid = currentQuestion.id ?? "";
     const isOpenEnded = currentQuestion.type === QuestionType.OPEN_ENDED;
-    const hasAnswer = isOpenEnded
-      ? textAnswers[currentQuestion.id]?.trim()
-      : answers[currentQuestion.id];
+    const hasAnswer = isOpenEnded ? textAnswers[qid]?.trim() : answers[qid];
 
     if (!hasAnswer) {
       toast.error(
@@ -167,10 +166,9 @@ export function useQuiz(shareCode: string) {
     }
 
     const currentQuestion = list.questions[currentQuestionIndex];
+    const qid = currentQuestion.id ?? "";
     const isOpenEnded = currentQuestion.type === QuestionType.OPEN_ENDED;
-    const hasAnswer = isOpenEnded
-      ? textAnswers[currentQuestion.id]?.trim()
-      : answers[currentQuestion.id];
+    const hasAnswer = isOpenEnded ? textAnswers[qid]?.trim() : answers[qid];
 
     if (!hasAnswer) {
       toast.error(
@@ -191,11 +189,12 @@ export function useQuiz(shareCode: string) {
 
       const answerArray = list.questions.map((q) => {
         const isQuestionOpenEnded = q.type === QuestionType.OPEN_ENDED;
+        const qid = q.id ?? "";
         return {
-          questionId: q.id,
+          questionId: qid,
           ...(isQuestionOpenEnded
-            ? { textAnswer: textAnswers[q.id] || "" }
-            : { selectedOptionId: answers[q.id] || "" }),
+            ? { textAnswer: textAnswers[qid] || "" }
+            : { selectedOptionId: answers[qid] || "" }),
         };
       });
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, QuestionType } from "@teachy/db";
 import { z } from "zod";
-import { requireTeacher } from "@/lib/api/auth";
+import { requireTeacher } from "@/lib/api/server";
 import {
   handleApiError,
   notFound,

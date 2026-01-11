@@ -80,7 +80,7 @@ export function QuizQuestionStep({
               <FormField
                 as="textarea"
                 id="text-answer"
-                value={textAnswers[currentQuestion.id] || ""}
+                value={textAnswers[currentQuestion.id ?? ""] || ""}
                 onChange={(e) => onTextAnswerChange(e.target.value)}
                 onBlur={(e) => onTextAnswerChange(e.currentTarget.value.trim())}
                 maxLength={2000}
@@ -91,8 +91,11 @@ export function QuizQuestionStep({
               />
             ) : (
               <QuizOptions
-                options={currentQuestion.options}
-                selectedOptionId={answers[currentQuestion.id]}
+                options={currentQuestion.options.map((opt) => ({
+                  id: opt.id ?? "",
+                  label: opt.label,
+                }))}
+                selectedOptionId={answers[currentQuestion.id ?? ""]}
                 onSelectOption={onSelectAnswer}
               />
             )}
