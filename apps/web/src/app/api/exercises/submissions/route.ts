@@ -70,12 +70,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Only count multiple choice questions for scoring
-    const multipleChoiceQuestions = exerciseList.questions.filter(
-      (q) => q.type === QuestionType.MULTIPLE_CHOICE
-    );
+    // Count all questions for scoring
+    const totalQuestions = exerciseList.questions.length;
 
-    const correctAnswers = multipleChoiceQuestions.reduce((acc, question) => {
+    const correctAnswers = exerciseList.questions.reduce((acc, question) => {
+      // Open-ended questions are always considered correct
+      if (question.type === QuestionType.OPEN_ENDED) {
+        return acc + 1;
+      }
+
+      // For multiple choice, check if the selected option is correct
       const correctOption = question.options.find((opt) => opt.isCorrect);
       const studentAnswer = validatedData.answers.find(
         (a) => a.questionId === question.id
@@ -90,11 +94,9 @@ export async function POST(request: NextRequest) {
       return acc;
     }, 0);
 
-    // Score is based only on multiple choice questions
+    // Score is based on all questions
     const score =
-      multipleChoiceQuestions.length > 0
-        ? (correctAnswers / multipleChoiceQuestions.length) * 100
-        : 0;
+      totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
 
     const existingSubmission = await prisma.submission.findUnique({
       where: {
@@ -207,7 +209,7 @@ export async function POST(request: NextRequest) {
       submission: {
         id: submission.id,
         score: submission.score,
-        totalQuestions: multipleChoiceQuestions.length,
+        totalQuestions,
         correctAnswers,
         answers: submission.answers.map((answer) => {
           const question = exerciseList.questions.find(
@@ -220,7 +222,7 @@ export async function POST(request: NextRequest) {
             selectedOptionId: answer.selectedOptionId || undefined,
             textAnswer: answer.textAnswer || undefined,
             isCorrect: isOpenEnded
-              ? undefined
+              ? true
               : answer.selectedOption?.isCorrect || false,
             correctOptionId: isOpenEnded
               ? undefined

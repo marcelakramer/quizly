@@ -105,12 +105,17 @@ export async function GET(
       }
     }
 
-    // Only count multiple choice questions for scoring
-    const multipleChoiceQuestions = submission.exerciseList.questions.filter(
-      (q) => q.type === QuestionType.MULTIPLE_CHOICE
-    );
-    const totalQuestions = multipleChoiceQuestions.length;
+    // Count all questions for scoring
+    const totalQuestions = submission.exerciseList.questions.length;
     const correctAnswers = submission.answers.reduce((acc, answer) => {
+      const question = submission.exerciseList.questions.find(
+        (q) => q.id === answer.questionId
+      );
+      // Open-ended questions are always considered correct
+      if (question?.type === QuestionType.OPEN_ENDED) {
+        return acc + 1;
+      }
+      // For multiple choice, check if the selected option is correct
       if (answer.selectedOption && answer.selectedOption.isCorrect) {
         return acc + 1;
       }
@@ -168,7 +173,7 @@ export async function GET(
               : undefined,
             textAnswer: answer.textAnswer || undefined,
             isCorrect: isOpenEnded
-              ? undefined
+              ? true
               : answer.selectedOption?.isCorrect || false,
             correctOptionId: isOpenEnded
               ? undefined

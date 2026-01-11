@@ -81,12 +81,18 @@ export async function GET(
       return NextResponse.json({ hasSubmission: false });
     }
 
-    // Only count multiple choice questions for scoring
-    const multipleChoiceQuestions = exerciseList.questions.filter(
-      (q) => q.type === QuestionType.MULTIPLE_CHOICE
-    );
+    // Count all questions for scoring
+    const totalQuestions = exerciseList.questions.length;
 
     const correctAnswers = submission.answers.reduce((acc, answer) => {
+      const question = exerciseList.questions.find(
+        (q) => q.id === answer.questionId
+      );
+      // Open-ended questions are always considered correct
+      if (question?.type === QuestionType.OPEN_ENDED) {
+        return acc + 1;
+      }
+      // For multiple choice, check if the selected option is correct
       if (answer.selectedOption && answer.selectedOption.isCorrect) {
         return acc + 1;
       }
@@ -98,7 +104,7 @@ export async function GET(
       submission: {
         id: submission.id,
         score: submission.score,
-        totalQuestions: multipleChoiceQuestions.length,
+        totalQuestions,
         correctAnswers,
         createdAt: submission.createdAt,
         answers: submission.answers.map((answer) => {
@@ -112,7 +118,7 @@ export async function GET(
             selectedOptionId: answer.selectedOptionId || undefined,
             textAnswer: answer.textAnswer || undefined,
             isCorrect: isOpenEnded
-              ? undefined
+              ? true
               : answer.selectedOption?.isCorrect || false,
             correctOptionId: isOpenEnded
               ? undefined
