@@ -1,14 +1,11 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { getAuthInstance } from "@teachy/firebase";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { UserRole } from "@teachy/db";
-import { getDashboardPathForRole } from "@/lib/utils/role";
 import { getAuthErrorMessage } from "@/lib/utils/auth";
-import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
@@ -39,7 +36,9 @@ export default function RegisterPage() {
     password: false,
     confirmPassword: false,
   });
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
+  const { register } = useAuth();
   const {
     isValid,
     nameError,
@@ -67,25 +66,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const auth = getAuthInstance();
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      const idToken = await userCredential.user.getIdToken();
-
-      await api.auth.sync(idToken, role, name);
-
+      await register(email, password, role, name);
       toast.success("Account created successfully!");
-
-      router.replace(getDashboardPathForRole(role));
     } catch (err) {
       toast.error(
         getAuthErrorMessage(err, "Failed to create account. Please try again.")
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -241,7 +227,11 @@ export default function RegisterPage() {
             Already have an account?{" "}
           </span>
           <Link
-            href="/login"
+            href={
+              redirectTo
+                ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+                : "/login"
+            }
             className="text-primary hover:text-primary/80 font-medium transition-colors ml-1"
           >
             Sign in here

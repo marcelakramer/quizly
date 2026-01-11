@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { getAuthInstance } from "@teachy/firebase";
-import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { getInitials } from "@/lib/utils/user";
 import { Logo } from "./Logo";
@@ -16,7 +14,7 @@ const publicRoutes = ["/login", "/register"];
 const publicRoutePrefixes = ["/quiz"];
 
 export function Header() {
-  const { firebaseUser, dbUser } = useAuth();
+  const { firebaseUser, dbUser, status, signOutUser } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,15 +36,11 @@ export function Header() {
     };
   }, [menuOpen]);
 
-  const handleLogout = async () => {
-    try {
-      const auth = getAuthInstance();
-      await signOut(auth);
-      setMenuOpen(false);
+  const handleLogout = () => {
+    setMenuOpen(false);
+    signOutUser().then(() => {
       router.push("/login");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+    });
   };
 
   const isPublicRoute = publicRoutes.includes(pathname);
@@ -56,6 +50,24 @@ export function Header() {
 
   if (isPublicRoute || isPublicPrefix) {
     return null;
+  }
+
+  // Don't render header content during transitions
+  if (status === "idle" || status === "loading" || status === "signing-out") {
+    return (
+      <header className="border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-semibold text-xl"
+          >
+            <Logo width={32} height={32} />
+            <span className="text-gray-900">Quizly</span>
+          </Link>
+          <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
+        </div>
+      </header>
+    );
   }
 
   const initials = dbUser?.name ? getInitials(dbUser.name) : null;

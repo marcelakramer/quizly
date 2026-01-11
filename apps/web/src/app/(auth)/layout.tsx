@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { UserRole } from "@teachy/db";
+import { getDashboardPathForRole } from "@/lib/utils/role";
 import { SplashScreen } from "@/components/SplashScreen";
 
 export default function AuthLayout({
@@ -11,25 +11,32 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { firebaseUser, dbUser, loading } = useAuth();
+  const { dbUser, status, completeSignOut } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
 
   useEffect(() => {
-    if (loading || !firebaseUser || !dbUser) return;
-
-    // Redirect authenticated users to their dashboard
-    if (dbUser.role === UserRole.TEACHER) {
-      router.replace("/teacher/dashboard");
-    } else {
-      router.replace("/student/dashboard");
+    if (status === "signing-out") {
+      completeSignOut();
     }
-  }, [firebaseUser, dbUser, loading, router]);
+  }, [status, completeSignOut]);
 
-  if (loading) {
+  useEffect(() => {
+    if (status !== "authenticated" || !dbUser) return;
+
+    if (redirectTo && redirectTo.startsWith("/")) {
+      router.replace(redirectTo);
+    } else {
+      router.replace(getDashboardPathForRole(dbUser.role));
+    }
+  }, [status, dbUser, router, redirectTo]);
+
+  if (status === "idle" || status === "loading") {
     return <SplashScreen />;
   }
 
-  if (firebaseUser && dbUser) {
+  if (status === "authenticated") {
     return <SplashScreen />;
   }
 

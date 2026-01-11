@@ -16,7 +16,7 @@ import { SubmissionDetail } from "@/types";
 export default function SubmissionDetails() {
   const params = useParams();
   const router = useRouter();
-  const { firebaseUser, dbUser, loading: authLoading } = useAuth();
+  const { firebaseUser, dbUser, status } = useAuth();
   const submissionId = params.submissionId as string;
 
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
@@ -25,6 +25,8 @@ export default function SubmissionDetails() {
     type: "not-found" | "forbidden" | "error";
     message: string;
   } | null>(null);
+
+  const authLoading = status === "idle" || status === "loading";
 
   useEffect(() => {
     const fetchSubmission = async () => {

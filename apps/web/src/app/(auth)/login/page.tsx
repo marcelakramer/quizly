@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { getAuthInstance } from "@teachy/firebase";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { api } from "@/lib/api";
-import { getDashboardPathForRole } from "@/lib/utils/role";
 import { getAuthErrorMessage } from "@/lib/utils/auth";
+import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Logo } from "@/components/Logo";
@@ -20,7 +17,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false });
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
+  const { signIn } = useAuth();
   const { isValid, emailError, passwordError } = useLoginValidation(
     email,
     password
@@ -41,25 +40,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const auth = getAuthInstance();
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      const idToken = await userCredential.user.getIdToken();
-
-      const { user: dbUser } = await api.auth.me(idToken);
-
+      await signIn(email, password);
       toast.success("Welcome back!");
-
-      router.push(getDashboardPathForRole(dbUser.role));
     } catch (err) {
       toast.error(
         getAuthErrorMessage(err, "Failed to sign in. Please try again.")
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -142,7 +128,11 @@ export default function LoginPage() {
             Don&apos;t have an account?{" "}
           </span>
           <Link
-            href="/register"
+            href={
+              redirectTo
+                ? `/register?redirect=${encodeURIComponent(redirectTo)}`
+                : "/register"
+            }
             className="text-primary hover:text-primary/80 font-medium transition-colors ml-1"
           >
             Register here

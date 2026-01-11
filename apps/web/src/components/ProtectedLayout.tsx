@@ -14,27 +14,31 @@ interface ProtectedLayoutProps {
 
 /**
  * ProtectedLayout component that:
- * - Shows loading state while auth is loading
- * - Redirects to /login only when loading is false AND user is null
+ * - Shows splash screen during auth transitions (loading, signing-out)
+ * - Redirects to /login when status is unauthenticated
  * - Optionally restricts access to a specific role
- * - Uses router.replace to avoid adding to history
  */
 export function ProtectedLayout({
   children,
   allowedRole,
 }: ProtectedLayoutProps) {
-  const { firebaseUser, dbUser, loading } = useAuth();
+  const { firebaseUser, dbUser, status } = useAuth();
   const router = useRouter();
   const roleErrorShownRef = useRef(false);
 
   useEffect(() => {
-    if (!loading && !firebaseUser) {
+    if (status === "unauthenticated") {
       router.replace("/login");
     }
-  }, [firebaseUser, loading, router]);
+  }, [status, router]);
 
   useEffect(() => {
-    if (!loading && dbUser && allowedRole && dbUser.role !== allowedRole) {
+    if (
+      status === "authenticated" &&
+      dbUser &&
+      allowedRole &&
+      dbUser.role !== allowedRole
+    ) {
       if (!roleErrorShownRef.current) {
         roleErrorShownRef.current = true;
 
@@ -47,14 +51,15 @@ export function ProtectedLayout({
         }
       }
     }
-  }, [dbUser, loading, allowedRole, router]);
+  }, [dbUser, status, allowedRole, router]);
 
-  if (loading) {
+  // Show splash during any transition state
+  if (status === "idle" || status === "loading" || status === "signing-out") {
     return <SplashScreen />;
   }
 
-  if (!firebaseUser) {
-    return null;
+  if (status === "unauthenticated" || !firebaseUser) {
+    return <SplashScreen />;
   }
 
   if (allowedRole && dbUser && dbUser.role !== allowedRole) {

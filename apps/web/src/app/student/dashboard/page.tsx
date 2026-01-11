@@ -38,11 +38,13 @@ import { StudentSubmission } from "@/types";
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const { firebaseUser, loading: authLoading } = useAuth();
+  const { firebaseUser, status } = useAuth();
   const [shareCode, setShareCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [submissions, setSubmissions] = useState<StudentSubmission[]>([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(true);
+
+  const authLoading = status === "idle" || status === "loading";
 
   useEffect(() => {
     const fetchSubmissions = async () => {

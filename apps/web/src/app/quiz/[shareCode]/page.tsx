@@ -41,7 +41,7 @@ export default function StudentQuiz() {
   const params = useParams();
   const router = useRouter();
   const shareCode = params.shareCode as string;
-  const { firebaseUser, dbUser, loading: authLoading } = useAuth();
+  const { firebaseUser, dbUser, status } = useAuth();
   const teacherRedirectedRef = useRef(false);
 
   const [step, setStep] = useState<QuizStep>("intro");
@@ -124,16 +124,18 @@ export default function StudentQuiz() {
       }
     };
 
-    if (authLoading) return;
+    // Wait for auth to fully resolve
+    if (status === "idle" || status === "loading") return;
 
-    if (!firebaseUser || !dbUser) {
-      toast.error("You must be logged in to take this quiz.");
-      router.push("/login");
+    if (status === "unauthenticated" || !firebaseUser || !dbUser) {
+      router.push(`/login?redirect=/quiz/${shareCode}`);
       return;
     }
 
     fetchData();
-  }, [shareCode, firebaseUser, dbUser, authLoading, router]);
+  }, [shareCode, firebaseUser, dbUser, status, router]);
+
+  const authLoading = status === "idle" || status === "loading";
 
   if (loading || authLoading || !dbUser) {
     return <QuizIntroSkeleton />;
