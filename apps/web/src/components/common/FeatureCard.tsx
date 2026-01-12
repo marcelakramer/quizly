@@ -1,10 +1,12 @@
 import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils/cn";
 
 interface FeatureCardProps {
   icon: LucideIcon;
   title: string;
   description: string;
   colorClass?: string;
+  className?: string;
   animationDelay?: string;
 }
 
@@ -14,10 +16,14 @@ export function FeatureCard({
   description,
   colorClass = "primary",
   animationDelay,
+  className = "",
 }: FeatureCardProps) {
   return (
     <div
-      className="glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up"
+      className={cn(
+        "glass-card hover-lift rounded-lg p-6 opacity-0 animate-fade-up",
+        className
+      )}
       style={animationDelay ? { animationDelay } : undefined}
     >
       <div

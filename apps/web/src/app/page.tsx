@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { ClipboardList, Users, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { UserRole } from "@teachy/db";
@@ -11,34 +12,82 @@ import { getDashboardPathForRole } from "@/lib/utils/role";
 export default function Home() {
   const { firebaseUser, dbUser } = useAuth();
 
+  const titles = [
+    "Create engaging assessments",
+    "Build interactive and fun quizzes",
+    "Track your students’ progress",
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayedTitle, setDisplayedTitle] = useState(titles[0]);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        const nextIndex = (currentIndex + 1) % titles.length;
+        setDisplayedTitle(titles[nextIndex]);
+        setCurrentIndex(nextIndex);
+        setFade(true);
+      }, 500);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [currentIndex]);
+
+  const renderTitle = (text: string) => {
+    const words = text.split(" ");
+    return words.map((word, i) => (
+      <span
+        key={i}
+        className={i % 2 !== 0 ? "text-primary" : "text-foreground"}
+      >
+        {word}{" "}
+      </span>
+    ));
+  };
+
   return (
-    <div className="min-h-full bg-background">
+    <div className="min-h-full bg-background scroll-smooth">
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-28">
-        <div className="mx-auto max-w-3xl text-center opacity-0 animate-fade-up">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-            Create engaging
-            <span className="text-primary"> assessments</span>
-            <br />
-            for your students
+        <div className="mx-auto max-w-3xl text-center relative">
+          {/* Hero Title */}
+          <h1
+            className={`text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight transition-all duration-700 ease-in-out transform opacity-0 ${
+              fade ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"
+            }`}
+            style={{ minHeight: "5rem" }} // fix height for 2 lines
+          >
+            {renderTitle(displayedTitle)}
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground md:text-xl">
+
+          <p className="mt-6 text-lg text-muted-foreground md:text-xl opacity-0 animate-fade-up animate-delay-200">
             Build interactive quizzes, share them with a simple link, and track
             your students&apos; progress—all in one place.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-2">
+
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-2 opacity-0 animate-fade-up animate-delay-300">
             {firebaseUser && dbUser ? (
-              <Button asChild size="lg">
+              <Button
+                asChild
+                size="lg"
+                className="transition-transform hover:scale-105 hover:shadow-lg"
+              >
                 <Link href={getDashboardPathForRole(dbUser.role as UserRole)}>
                   Go to Dashboard
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
             ) : (
-              <Button asChild size="lg">
+              <Button
+                asChild
+                size="lg"
+                className="transition-transform hover:scale-105 hover:shadow-lg"
+              >
                 <Link href="/register">
                   Get Started
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
             )}
@@ -54,27 +103,28 @@ export default function Home() {
             title="Create Lists"
             description="Build exercise lists with multiple-choice questions. Add as many questions and options as you need."
             colorClass="primary"
+            className="transition-transform hover:scale-105 hover:shadow-2xl animate-fade-up animate-delay-100"
           />
           <FeatureCard
             icon={Users}
             title="Share Easily"
             description="Share a simple link with your students. They can take the quiz from any device, no login required."
             colorClass="accent"
-            animationDelay="150ms"
+            className="transition-transform hover:scale-105 hover:shadow-2xl animate-fade-up animate-delay-200"
           />
           <FeatureCard
             icon={CheckCircle}
             title="Track Results"
             description="View all student submissions in one place. See scores, averages, and individual responses."
             colorClass="success"
-            animationDelay="300ms"
+            className="transition-transform hover:scale-105 hover:shadow-2xl animate-fade-up animate-delay-300"
           />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border py-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground opacity-0 animate-fade-up animate-delay-400">
           <p>&copy; {new Date().getFullYear()} Quizly. All rights reserved.</p>
         </div>
       </footer>
