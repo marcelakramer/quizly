@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Button } from "../ui/button";
 
 interface TitleClampProps {
   title: string;
@@ -35,19 +36,20 @@ export function TitleClamp({ title, lines = 3 }: TitleClampProps) {
     <div>
       <p
         ref={ref}
-        className="font-medium whitespace-pre-wrap break-words"
+        className="min-w-0 overflow-hidden break-all whitespace-pre-wrap"
         style={clampStyle}
       >
         {title}
       </p>
       {showToggle && (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="xs"
           onClick={() => setExpanded((s) => !s)}
-          className="text-sm text-primary hover:underline mt-1"
+          className="text-sm text-primary mt-1"
         >
           {expanded ? "See less" : "See more"}
-        </button>
+        </Button>
       )}
     </div>
   );

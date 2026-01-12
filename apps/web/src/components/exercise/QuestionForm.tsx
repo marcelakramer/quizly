@@ -289,12 +289,12 @@ export function QuestionForm({
               {isEditing ? (
                 <>
                   <Check className="mr-2 h-4 w-4" />
-                  Update Question
+                  Update
                 </>
               ) : (
                 <>
                   <Check className="mr-2 h-4 w-4" />
-                  Add Question
+                  Add
                 </>
               )}
             </Button>

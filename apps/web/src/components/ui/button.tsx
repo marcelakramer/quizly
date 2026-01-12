@@ -10,7 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | "ghost"
     | "destructive"
     | "tertiary";
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   asChild?: boolean;
 }
 
@@ -43,6 +43,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizeClasses = {
+      xs: "h-6 px-2 text-xs",
       sm: "h-8 px-3 text-sm",
       md: "h-10 px-4 py-2",
       lg: "h-11 px-8 text-lg",

@@ -20,12 +20,14 @@ export default function TeacherDashboard() {
         title="My Exercise Lists"
         description="Create and manage quizzes for your students"
         actions={
-          <Button asChild>
-            <Link href="/teacher/exercise-lists/create">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New List
-            </Link>
-          </Button>
+          <div className="w-full sm:w-auto">
+            <Button asChild className="w-full sm:w-auto">
+              <Link href="/teacher/exercise-lists/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Create New List
+              </Link>
+            </Button>
+          </div>
         }
       />
 

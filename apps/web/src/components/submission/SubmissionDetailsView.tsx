@@ -6,6 +6,7 @@ import { AnimatedNumber } from "@/components/common";
 import { PageContainer } from "@/components/layout";
 import { StatCard } from "@/components/common";
 import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
+import { useState } from "react";
 import { QuestionType } from "@teachy/db";
 import { SubmissionDetail } from "@/types";
 import { getResultMessage } from "@/lib/utils/exercise";
@@ -39,6 +40,16 @@ export function SubmissionDetailsView({
   const sortedAnswers = [...submission.answers].sort(
     (a, b) => a.question.order - b.question.order
   );
+  const [expandedAnswers, setExpandedAnswers] = useState<
+    Record<string, boolean>
+  >({});
+
+  const toggleExpand = (questionId: string) => {
+    setExpandedAnswers((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId],
+    }));
+  };
 
   const FirstCardIcon = firstCardContent.icon;
 
@@ -196,15 +207,34 @@ export function SubmissionDetailsView({
                             </p>
                             <p
                               className="text-sm text-success whitespace-pre-wrap break-words"
-                              style={{
-                                display: "-webkit-box",
-                                WebkitLineClamp: 6,
-                                WebkitBoxOrient: "vertical",
-                                overflow: "hidden",
-                              }}
+                              style={
+                                expandedAnswers[answer.questionId]
+                                  ? undefined
+                                  : {
+                                      display: "-webkit-box",
+                                      WebkitLineClamp: 6,
+                                      WebkitBoxOrient: "vertical",
+                                      overflow: "hidden",
+                                    }
+                              }
                             >
                               {answer.textAnswer || "No answer provided"}
                             </p>
+                            {answer.textAnswer &&
+                              answer.textAnswer.length > 300 && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="mt-2 px-2 text-xs text-primary"
+                                  onClick={() =>
+                                    toggleExpand(answer.questionId)
+                                  }
+                                >
+                                  {expandedAnswers[answer.questionId]
+                                    ? "See less"
+                                    : "See more"}
+                                </Button>
+                              )}
                           </div>
                         ) : (
                           <>
