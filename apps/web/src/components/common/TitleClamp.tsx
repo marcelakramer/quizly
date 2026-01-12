@@ -36,17 +36,17 @@ export function TitleClamp({ title, lines = 3 }: TitleClampProps) {
     <div>
       <p
         ref={ref}
-        className="min-w-0 overflow-hidden break-all whitespace-pre-wrap"
+        className="min-w-0 overflow-hidden break-word whitespace-pre-wrap"
         style={clampStyle}
       >
         {title}
       </p>
       {showToggle && (
         <Button
-          variant="ghost"
+          variant="tertiary"
           size="xs"
           onClick={() => setExpanded((s) => !s)}
-          className="text-sm text-primary mt-1"
+          className="text-sm text-primary"
         >
           {expanded ? "See less" : "See more"}
         </Button>

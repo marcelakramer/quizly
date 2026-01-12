@@ -39,9 +39,6 @@ export default function TeacherDashboard() {
           icon={ClipboardList}
           title="No exercise lists yet"
           description="Create your first exercise list to start assessing your students"
-          buttonText="Create Your First List"
-          buttonHref="/teacher/exercise-lists/create"
-          buttonIcon={Plus}
         />
       ) : (
         <div className="grid gap-4">

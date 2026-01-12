@@ -2,9 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AnimatedNumber } from "@/components/common";
+import { AnimatedNumber, StatCard, TitleClamp } from "@/components/common";
 import { PageContainer } from "@/components/layout";
-import { StatCard } from "@/components/common";
 import { ArrowLeft, CheckCircle, XCircle, User, Clock } from "lucide-react";
 import { useState } from "react";
 import { QuestionType } from "@teachy/db";
@@ -188,17 +187,12 @@ export function SubmissionDetailsView({
                       <XCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
                     )}
                     <div className="flex-1">
-                      <p
-                        className="font-semibold text-foreground mb-2 whitespace-pre-wrap break-words"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
-                        Q{index + 1}: {answer.question.title}
-                      </p>
+                      <div className="font-semibold text-foreground mb-2">
+                        <TitleClamp
+                          title={`Q${index + 1}: ${answer.question.title}`}
+                          lines={3}
+                        />
+                      </div>
                       <div className="space-y-2">
                         {isOpenEnded ? (
                           <div>

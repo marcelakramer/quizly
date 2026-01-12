@@ -50,7 +50,7 @@ export function ExerciseListCard({ list, index }: ExerciseListCardProps) {
     >
       <CardHeader className="pb-3">
         <div className="flex gap-3 items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex gap-3 min-w-0">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <ClipboardList className="h-5 w-5 text-primary" />
             </div>
