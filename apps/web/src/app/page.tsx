@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -9,31 +10,33 @@ import { Button } from "@/components/ui/button";
 import { FeatureCard } from "@/components/common";
 import { getDashboardPathForRole } from "@/lib/utils/role";
 
+const HERO_TITLES = [
+  "Create engaging assessments",
+  "Build interactive and fun quizzes",
+  "Track your students’ progress",
+];
+
 export default function Home() {
   const { firebaseUser, dbUser } = useAuth();
 
-  const titles = [
-    "Create engaging assessments",
-    "Build interactive and fun quizzes",
-    "Track your students’ progress",
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [displayedTitle, setDisplayedTitle] = useState(titles[0]);
+  const [_currentIndex, setCurrentIndex] = useState(0);
+  const [displayedTitle, setDisplayedTitle] = useState(HERO_TITLES[0]);
   const [fade, setFade] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
-        const nextIndex = (currentIndex + 1) % titles.length;
-        setDisplayedTitle(titles[nextIndex]);
-        setCurrentIndex(nextIndex);
+        setCurrentIndex((prev) => {
+          const next = (prev + 1) % HERO_TITLES.length;
+          setDisplayedTitle(HERO_TITLES[next]);
+          return next;
+        });
         setFade(true);
       }, 500);
     }, 3500);
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, []);
 
   const renderTitle = (text: string) => {
     const words = text.split(" ");

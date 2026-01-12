@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { ExerciseListForm } from "@/components/exercise";
 import { PageContainer } from "@/components/layout";
