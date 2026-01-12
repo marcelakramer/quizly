@@ -1,21 +1,22 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import Link from "next/link";
-import { formatDate } from "@/lib/utils/date";
-import { getScoreColorClass } from "@/lib/utils/exercise";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader, PageContainer } from "@/components/layout";
-import { IconCardHeader, StatCard } from "@/components/common";
+import {
+  IconCardHeader,
+  StatCard,
+  EmptyState,
+  AnimatedNumber,
+} from "@/components/common";
+import { ResultListItem } from "@/components/submission";
 import {
   Hash,
   ArrowRight,
   Key,
   Trophy,
-  User,
-  Clock,
   FileText,
   TrendingUp,
   Award,
@@ -23,7 +24,6 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { StudentDashboardSkeleton } from "@/components/dashboard";
-import { EmptyState, AnimatedNumber } from "@/components/common";
 import { useStudentSubmissions } from "@/hooks/use-student-submissions";
 import { useShareCodeNavigation } from "@/hooks/use-share-code-navigation";
 
@@ -202,55 +202,13 @@ export default function StudentDashboard() {
               />
             ) : (
               <div className="space-y-3">
-                {submissions.map((submission, index) => {
-                  const percentage = submission.score;
-                  const scoreColorClass = getScoreColorClass(percentage);
-
-                  return (
-                    <Link
-                      key={submission.id}
-                      href={`/results/${submission.id}`}
-                      className="block rounded-lg border border-border/50 p-4 hover:border-primary/50 hover:bg-primary/5 transition-all opacity-0 animate-fade-up active:scale-[0.99] active:brightness-95"
-                      style={{ animationDelay: `${0.4 + index * 0.05}s` }}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-foreground mb-1">
-                            {submission.exerciseList.title}
-                          </h3>
-                          {submission.exerciseList.description && (
-                            <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
-                              {submission.exerciseList.description}
-                            </p>
-                          )}
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              {submission.exerciseList.teacher.name}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <FileText className="h-3 w-3" />
-                              {submission.exerciseList.questionCount} questions
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {formatDate(submission.createdAt)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right ml-4">
-                          <p className={`text-lg font-bold ${scoreColorClass}`}>
-                            {submission.correctAnswers}/
-                            {submission.totalQuestions}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {percentage.toFixed(0)}%
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+                {submissions.map((submission, index) => (
+                  <ResultListItem
+                    key={submission.id}
+                    submission={submission}
+                    index={index}
+                  />
+                ))}
               </div>
             )}
           </CardContent>
