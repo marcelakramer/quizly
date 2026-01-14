@@ -1,4 +1,4 @@
-# Teachy Technical Challenge
+# Quizly
 
 Quizly is an education platform that helps teachers create, share and assign exercise lists, while allowing students to complete exercises and review their results.
 
