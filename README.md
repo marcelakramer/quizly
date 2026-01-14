@@ -53,15 +53,15 @@ This repository is organized as a **monorepo** using **Turborepo** and **pnpm wo
 
 ### Live Demo
 
-You can try the live demo [here](https://teachy-technical-challenge-git-main-marcela-kramers-projects.vercel.app/)!
+You can try the live demo [here](https://quizly-platform.vercel.app/)!
 
 ### Quick start
 
 1. **Clone the repository**
 
 ```bash
-   git clone git@github.com:marcelakramer/teachy-technical-challenge.git
-   cd teachy-technical-challenge
+   git clone git@github.com:marcelakramer/quizly.git
+   cd quizly
 ```
 
 2. **Install dependencies**
@@ -96,7 +96,7 @@ The web app will be available at http://localhost:3000 by default.
 ## 📁 Project layout (high level)
 
 ```
-teachy-technical-challenge/
+quizly/
 ├── apps/
 │   └── web/              # Next.js application (main app)
 │       ├── app/          # App Router pages and API routes
